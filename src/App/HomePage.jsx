@@ -130,7 +130,13 @@ export default function Homepage() {
         </div>
         <div className="recommended-grid">
           {loading && <p>Loading recipes...</p>}
+
           {error && <p className="error">{error}</p>}
+
+          {recipes.length === 0 && !loading && !error && (
+            <p>No results for this query.</p>
+          )}
+
           {!loading && !error && <RecipeList recipes={recipes} />}
         </div>
       </div>
