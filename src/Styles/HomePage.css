@@ -160,6 +160,26 @@ a {
   color: var(--text-secondary);
 }
 
+.search-bar .filter-icon {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    color 0.15s;
+}
+.search-bar .filter-icon:hover {
+  background: var(--pill-bg);
+  color: var(--text-primary);
+}
+.search-bar .filter-icon.active {
+  background: var(--accent-light);
+  color: var(--accent-dark);
+}
+
 .topbar .actions {
   display: flex;
   align-items: center;
@@ -295,10 +315,21 @@ a {
   stroke: none;
 }
 
-.category-chip {
+.category-row {
+  /* display: flex; */
+
   position: absolute;
   bottom: 12px;
   right: 12px;
+  gap: 10px;
+  overflow-x: auto;
+  padding-bottom: 6px;
+}
+.category-chip {
+  /* position: absolute;
+  bottom: 12px; */
+  /* right: 12px; */
+  flex: 0 0 auto;
   background: rgba(0, 0, 0, 0.55);
   color: #fff;
   font-size: 12px;
@@ -347,7 +378,6 @@ a {
   gap: 10px;
   overflow-x: auto;
   padding-bottom: 6px;
-  margin-bottom: 22px;
 }
 .pill {
   flex: 0 0 auto;
