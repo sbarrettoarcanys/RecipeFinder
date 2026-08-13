@@ -2,79 +2,81 @@ import { useState, useEffect } from "react";
 import "@/Styles/HomePage.css";
 import { debounceInput } from "../Hooks/Debounce.js";
 import { getRecipesBySearch } from "../Hooks/ApiCalls.js";
+import { RecipeList } from "../Components/RecipeList.jsx";
 
-function FavoriteButton({ recipeId }) {
-  const [isFavorite, setIsFavorite] = useState(false);
+import { NavLink } from "react-router";
 
-  return (
-    <span
-      className={`badge ${isFavorite ? "like" : "default"}`}
-      onClick={() => setIsFavorite((prev) => !prev)}
-      role="button"
-      tabIndex={0}
-    >
-      <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor">
-        <path d="M12 20.5c-1.1-1.1-7.5-5.9-9.2-9.2A5.2 5.2 0 0 1 7.6 4.5c1.7 0 2.8.8 3.4 1.8.6-1 1.7-1.8 3.4-1.8a5.2 5.2 0 0 1 4.8 6.8c-1.7 3.3-8.1 8.1-9.2 9.2Z" />
-      </svg>
-    </span>
-  );
-}
-
-function RecipeCard({ recipe }) {
-  return (
-    <div className="recipe-card">
-      <div
-        className="thumb"
-        style={{ backgroundImage: `url(${recipe.strMealThumb})` }}
-      >
-        <FavoriteButton recipeId={recipe.idMeal} />
-        <span className="category-chip">{recipe.strCategory}</span>
-      </div>
-      <div className="info">
-        <h3>{recipe.strMeal}</h3>
-      </div>
-    </div>
-  );
-}
-
-function RecipeList({ recipes }) {
+function SearchBar({ search, onSearchChange }) {
   return (
     <>
-      {recipes.map((recipe) => (
-        <RecipeCard key={recipe.idMeal} recipe={recipe} />
-      ))}
+      <div className="search-bar">
+        <svg
+          width="17"
+          height="17"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+        >
+          <circle cx="11" cy="11" r="7" />
+          <path d="M21 21l-4.3-4.3" />
+        </svg>
+        <input
+          type="text"
+          placeholder="Search recipes"
+          id="search-input"
+          value={search}
+          onChange={(e) => onSearchChange(e.target.value)}
+        />
+
+        {/* <svg
+          width="16"
+          height="16"
+          fill="currentColor"
+          viewBox="0 0 16 16"
+          className="filter-icon"
+        >
+          <path d="M6 10.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1-.5-.5m-2-3a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5m-2-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5" />
+        </svg> */}
+      </div>
     </>
   );
 }
 
-function SearchBar({ search, onSearchChange }) {
+function FilterRecipes({ onFilterChange }) {
+  const [activeFilter, setActiveFilter] = useState("s");
+  const filters = [
+    { label: "Dish Name", value: "s" },
+    { label: "Category", value: "c" },
+    { label: "Ingredient", value: "i" },
+    { label: "Area", value: "a" },
+  ];
+
   return (
-    <div className="search-bar">
-      <svg
-        width="17"
-        height="17"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-      >
-        <circle cx="11" cy="11" r="7" />
-        <path d="M21 21l-4.3-4.3" />
-      </svg>
-      <input
-        type="text"
-        placeholder="Search recipes"
-        id="search-input"
-        value={search}
-        onChange={(e) => onSearchChange(e.target.value)}
-      />
-    </div>
+    <>
+      <div className="pill-row">
+        {filters.map((filter) => (
+          <div
+            key={filter.value}
+            className={`pill ${activeFilter === filter.value ? "active" : ""}`}
+            onClick={() => {
+              setActiveFilter(filter.value);
+              onFilterChange(filter.value);
+            }}
+          >
+            {filter.label}
+          </div>
+        ))}
+      </div>
+    </>
   );
 }
 
 export default function Homepage() {
   const [search, setSearch] = useState("");
+  const [filter, setFilter] = useState("s");
+
   const debouncedSearch = debounceInput(search, 500);
 
   const [recipes, setRecipes] = useState([]);
@@ -88,7 +90,7 @@ export default function Homepage() {
       setLoading(true);
       setError(null);
       try {
-        const data = await getRecipesBySearch(debouncedSearch);
+        const data = await getRecipesBySearch(debouncedSearch, filter);
         if (!isCancelled) {
           setRecipes(data?.meals || []);
         }
@@ -108,7 +110,7 @@ export default function Homepage() {
     return () => {
       isCancelled = true;
     };
-  }, [debouncedSearch]);
+  }, [debouncedSearch, filter]);
 
   return (
     <>
@@ -118,7 +120,10 @@ export default function Homepage() {
           <h1>Recipes</h1>
         </div>
 
-        <SearchBar search={search} onSearchChange={setSearch} />
+        <div style={{ display: "flex", gap: "1rem" }}>
+          <SearchBar search={search} onSearchChange={setSearch} />
+          <FilterRecipes onFilterChange={setFilter} />
+        </div>
       </div>
 
       <div className="section">
