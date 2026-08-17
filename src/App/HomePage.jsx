@@ -4,7 +4,7 @@ import { debounceInput } from "../Hooks/Debounce.js";
 import { getRecipesBySearch } from "../Hooks/ApiCalls.js";
 import { RecipeList } from "../Components/RecipeList.jsx";
 
-import { NavLink } from "react-router";
+import { useSearchParams } from "react-router";
 
 function SearchBar({ search, onSearchChange }) {
   return (
@@ -44,8 +44,8 @@ function SearchBar({ search, onSearchChange }) {
   );
 }
 
-function FilterRecipes({ onFilterChange }) {
-  const [activeFilter, setActiveFilter] = useState("s");
+function FilterRecipes({ filter, onFilterChange }) {
+  const [activeFilter, setActiveFilter] = useState(filter);
   const filters = [
     { label: "Dish Name", value: "s" },
     { label: "Category", value: "c" },
@@ -74,8 +74,10 @@ function FilterRecipes({ onFilterChange }) {
 }
 
 export default function Homepage() {
-  const [search, setSearch] = useState("");
-  const [filter, setFilter] = useState("s");
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const [search, setSearch] = useState(searchParams.get("search") || "");
+  const [filter, setFilter] = useState(searchParams.get("filter") || "s");
 
   const debouncedSearch = debounceInput(search, 500);
 
@@ -94,6 +96,23 @@ export default function Homepage() {
         if (!isCancelled) {
           setRecipes(data?.meals || []);
         }
+
+        setSearchParams((prevParams) => {
+          if (debouncedSearch) {
+            prevParams.set("search", debouncedSearch);
+          } else {
+            prevParams.delete("search");
+          }
+
+          if (!filter) {
+            prevParams.delete("filter");
+          } else {
+            prevParams.set("filter", filter); // Reset page when changing sort order
+          }
+
+          // 2. Return it to update the URL
+          return prevParams;
+        });
       } catch (err) {
         if (!isCancelled) {
           setError(err.message);
@@ -122,7 +141,7 @@ export default function Homepage() {
 
         <div style={{ display: "flex", gap: "1rem" }}>
           <SearchBar search={search} onSearchChange={setSearch} />
-          <FilterRecipes onFilterChange={setFilter} />
+          <FilterRecipes filter={filter} onFilterChange={setFilter} />
         </div>
       </div>
 
