@@ -36,3 +36,23 @@ export const getRandomRecipe = async () => {
 
   return data;
 };
+
+export const getAllCategories = async () => {
+  const response = await fetch(`${BASE_URL}/categories.php`);
+
+  if (!response.ok) throw new Error("Network response failed");
+
+  const data = await response.json();
+
+  return data;
+};
+
+export const getRecipesByCategory = async (category) => {
+  const response = await fetch(`${BASE_URL}/filter.php?c=${category}`);
+
+  if (!response.ok) throw new Error("Network response failed");
+
+  const data = await response.json();
+
+  return data;
+};
