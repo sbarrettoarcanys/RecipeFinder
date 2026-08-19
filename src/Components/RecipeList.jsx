@@ -1,6 +1,7 @@
 import "@/Styles/HomePage.css";
 import { useState, useEffect } from "react";
 import { NavLink } from "react-router";
+import { useFavoriteRecipeContext } from "../Context/FavoriteRecipeContext.jsx";
 
 export default function RecipeList({ recipes }) {
   return (
@@ -20,7 +21,7 @@ function RecipeCard({ recipe }) {
           className="thumb"
           style={{ backgroundImage: `url(${recipe.strMealThumb})` }}
         >
-          <FavoriteButton recipeId={recipe.idMeal} />
+          <FavoriteButton recipe={recipe} />
 
           <div className="category-row">
             {recipe.strCategory && (
@@ -40,18 +41,22 @@ function RecipeCard({ recipe }) {
   );
 }
 
-function FavoriteButton({ recipeId }) {
-  const [isFavorite, setIsFavorite] = useState(false);
+function FavoriteButton({ recipe }) {
+  const { isFavoriteRecipe, addToFavoriteRecipes, removeFromFavoriteRecipes } =
+    useFavoriteRecipeContext();
+  const isfavoriteRecipe = isFavoriteRecipe(recipe.idMeal);
 
   const handleClick = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    setIsFavorite((prev) => !prev);
+
+    if (isfavoriteRecipe) removeFromFavoriteRecipes(recipe.idMeal);
+    else addToFavoriteRecipes(recipe);
   };
 
   return (
     <span
-      className={`badge ${isFavorite ? "like" : "default"}`}
+      className={`badge ${isfavoriteRecipe ? "like" : "default"}`}
       onClick={handleClick}
       role="button"
       tabIndex={0}
