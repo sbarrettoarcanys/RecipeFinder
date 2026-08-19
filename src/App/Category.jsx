@@ -3,69 +3,10 @@ import "@/Styles/HomePage.css";
 import { debounceInput } from "../Hooks/Debounce.js";
 import { getAllCategories, getRecipesByCategory } from "../Hooks/ApiCalls.js";
 import { RecipeList } from "../Components/RecipeList.jsx";
+import { SearchBar } from "../Components/SearchBar.jsx";
+import { FilterRecipes } from "../Components/FilterRecipes.jsx";
 
 import { useSearchParams } from "react-router";
-
-function SearchBar({ search, onSearchChange }) {
-  return (
-    <>
-      <div className="search-bar">
-        <svg
-          width="17"
-          height="17"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-        >
-          <circle cx="11" cy="11" r="7" />
-          <path d="M21 21l-4.3-4.3" />
-        </svg>
-        <input
-          type="text"
-          placeholder="Search recipes"
-          id="search-input"
-          value={search}
-          onChange={(e) => onSearchChange(e.target.value)}
-        />
-
-        {/* <svg
-          width="16"
-          height="16"
-          fill="currentColor"
-          viewBox="0 0 16 16"
-          className="filter-icon"
-        >
-          <path d="M6 10.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1-.5-.5m-2-3a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5m-2-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5" />
-        </svg> */}
-      </div>
-    </>
-  );
-}
-
-function FilterRecipes({ filter, onFilterChange, categoryFilters }) {
-  const [activeFilter, setActiveFilter] = useState(filter);
-
-  return (
-    <>
-      <div className="pill-row">
-        {categoryFilters.map((filter) => (
-          <div
-            key={filter.idCategory}
-            className={`pill ${activeFilter === filter.strCategory ? "active" : ""}`}
-            onClick={() => {
-              setActiveFilter(filter.strCategory);
-              onFilterChange(filter.strCategory);
-            }}
-          >
-            {filter.strCategory}
-          </div>
-        ))}
-      </div>
-    </>
-  );
-}
 
 function searchFromRecipes(searchTerm, recipes) {
   if (!searchTerm) return recipes ?? [];
@@ -110,7 +51,7 @@ export default function Homepage() {
             prevParams.delete("search");
           }
 
-          if (!filter || filter === "s") {
+          if (!filter) {
             prevParams.delete("filter");
           } else {
             prevParams.set("filter", filter); // Reset page when changing sort order
