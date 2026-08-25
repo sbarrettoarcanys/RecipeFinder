@@ -68,7 +68,7 @@ export default function SideBar() {
               </svg>
             </div>
           </NavLink>
-          <NavLink className="nav-btn" to="/random">
+          <NavLink className="nav-btn" to="/random" reloadDocument={true}>
             <div title="Random">
               <svg
                 width="20"

@@ -39,6 +39,30 @@
   margin: 0;
 }
 
+.meal-detail-favorite {
+  margin-top: 14px;
+}
+.meal-detail-favorite .badge {
+  position: static;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  justify-content: center;
+  border-radius: 50%;
+  box-shadow: var(--shadow-sm);
+  transition:
+    transform 0.15s,
+    box-shadow 0.15s;
+}
+.meal-detail-favorite .badge svg {
+  width: 15px;
+  height: 15px;
+}
+.meal-detail-favorite .badge:hover {
+  transform: scale(1.08);
+  box-shadow: var(--shadow-md);
+}
+
 .meal-detail-meta {
   display: flex;
   flex-direction: column;

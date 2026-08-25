@@ -4,6 +4,7 @@ import "@/Styles/MealDetail.css";
 import { getRecipeById } from "../Hooks/ApiCalls.js";
 import IngredientList from "../Components/IngredientsList.jsx";
 import StepList from "../Components/StepList.jsx";
+import { FavoriteButton } from "../Components/RecipeList.jsx";
 
 export default function MealDetail() {
   const params = useParams();
@@ -67,6 +68,10 @@ export default function MealDetail() {
           <p className="meal-detail-subtitle">
             {[recipe.strCategory, recipe.strArea].filter(Boolean).join(" · ")}
           </p>
+
+          <div className="meal-detail-favorite">
+            <FavoriteButton recipe={recipe} />
+          </div>
         </div>
 
         <div className="meal-detail-meta">

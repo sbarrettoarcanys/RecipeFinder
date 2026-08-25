@@ -1,9 +1,9 @@
 import "@/Styles/HomePage.css";
-import { useState, useEffect } from "react";
+import { useState, useEffect, memo } from "react";
 import { NavLink } from "react-router";
 import { useFavoriteRecipeContext } from "../Context/FavoriteRecipeContext.jsx";
 
-export default function RecipeList({ recipes }) {
+const RecipeList = memo(function RecipeList({ recipes }) {
   return (
     <>
       {recipes.map((recipe) => (
@@ -11,9 +11,9 @@ export default function RecipeList({ recipes }) {
       ))}
     </>
   );
-}
+});
 
-function RecipeCard({ recipe }) {
+const RecipeCard = memo(function RecipeCard({ recipe }) {
   return (
     <div>
       <NavLink to={`/meal-detail/${recipe.idMeal}`} className="recipe-card">
@@ -39,9 +39,9 @@ function RecipeCard({ recipe }) {
       </NavLink>
     </div>
   );
-}
+});
 
-function FavoriteButton({ recipe }) {
+const FavoriteButton = memo(function FavoriteButton({ recipe }) {
   const { isFavoriteRecipe, addToFavoriteRecipes, removeFromFavoriteRecipes } =
     useFavoriteRecipeContext();
   const isfavoriteRecipe = isFavoriteRecipe(recipe.idMeal);
@@ -60,12 +60,14 @@ function FavoriteButton({ recipe }) {
       onClick={handleClick}
       role="button"
       tabIndex={0}
+      title={isfavoriteRecipe ? "Unfavorite" : "Favorite"}
     >
       <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor">
         <path d="M12 20.5c-1.1-1.1-7.5-5.9-9.2-9.2A5.2 5.2 0 0 1 7.6 4.5c1.7 0 2.8.8 3.4 1.8.6-1 1.7-1.8 3.4-1.8a5.2 5.2 0 0 1 4.8 6.8c-1.7 3.3-8.1 8.1-9.2 9.2Z" />
       </svg>
     </span>
   );
-}
+});
 
+export default RecipeList;
 export { RecipeList, RecipeCard, FavoriteButton };
