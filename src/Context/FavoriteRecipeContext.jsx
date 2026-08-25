@@ -1,4 +1,11 @@
-import { createContext, useState, useContext, useEffect } from "react";
+import {
+  createContext,
+  useState,
+  useContext,
+  useEffect,
+  useCallback,
+  useMemo,
+} from "react";
 
 const FavoriteRecipeContext = createContext(null);
 
@@ -20,44 +27,61 @@ export const FavoriteRecipeProvider = ({ children }) => {
   }, [favoriteRecipes]);
 
   // addin of recipes to state
-  const addToFavoriteRecipes = (recipe) => {
+  const addToFavoriteRecipes = useCallback((recipe) => {
     setFavoriteRecipes((recipes) => [...recipes, recipe]);
-  };
+  }, []);
 
   //removal of recipe on state
   //will trigger the useEffect to update recipe list in localStorage
-  const removeFromFavoriteRecipes = (recipeId) => {
+  const removeFromFavoriteRecipes = useCallback((recipeId) => {
     setFavoriteRecipes((recipes) =>
       recipes.filter((recipe) => recipe.idMeal !== recipeId),
     );
-  };
+  }, []);
 
-  const isFavoriteRecipe = (recipeId) => {
-    return favoriteRecipes.some((recipe) => recipe.idMeal === recipeId);
-  };
+  const isFavoriteRecipe = useCallback(
+    (recipeId) => {
+      return favoriteRecipes.some((recipe) => recipe.idMeal === recipeId);
+    },
+    [favoriteRecipes],
+  );
 
-  const searchFavoriteRecipe = (searchTerm, category) => {
-    const recipesByCategory =
-      category && category !== "All"
-        ? favoriteRecipes.filter((recipe) =>
-            recipe.strCategory.toLowerCase().includes(category.toLowerCase()),
+  const searchFavoriteRecipe = useCallback(
+    (searchTerm, category) => {
+      const recipesByCategory =
+        category && category !== "All"
+          ? favoriteRecipes.filter((recipe) =>
+              recipe.strCategory
+                .toLowerCase()
+                .includes(category.toLowerCase()),
+            )
+          : favoriteRecipes;
+
+      return searchTerm
+        ? recipesByCategory.filter((recipe) =>
+            recipe.strMeal.toLowerCase().includes(searchTerm.toLowerCase()),
           )
-        : favoriteRecipes;
+        : recipesByCategory;
+    },
+    [favoriteRecipes],
+  );
 
-    return searchTerm
-      ? recipesByCategory.filter((recipe) =>
-          recipe.strMeal.toLowerCase().includes(searchTerm.toLowerCase()),
-        )
-      : recipesByCategory;
-  };
-
-  const value = {
-    favoriteRecipes,
-    addToFavoriteRecipes,
-    removeFromFavoriteRecipes,
-    isFavoriteRecipe,
-    searchFavoriteRecipe,
-  };
+  const value = useMemo(
+    () => ({
+      favoriteRecipes,
+      addToFavoriteRecipes,
+      removeFromFavoriteRecipes,
+      isFavoriteRecipe,
+      searchFavoriteRecipe,
+    }),
+    [
+      favoriteRecipes,
+      addToFavoriteRecipes,
+      removeFromFavoriteRecipes,
+      isFavoriteRecipe,
+      searchFavoriteRecipe,
+    ],
+  );
 
   return (
     <FavoriteRecipeContext.Provider value={value}>

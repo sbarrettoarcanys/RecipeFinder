@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, memo } from "react";
 
-export function HomeFilterRecipes({ filter, onFilterChange }) {
+function HomeFilterRecipesImpl({ filter, onFilterChange }) {
   const [activeFilter, setActiveFilter] = useState(filter);
   const filters = [
     { label: "Dish Name", value: "s" },
@@ -28,3 +28,5 @@ export function HomeFilterRecipes({ filter, onFilterChange }) {
     </>
   );
 }
+
+export const HomeFilterRecipes = memo(HomeFilterRecipesImpl);
