@@ -1,44 +1,20 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router";
 import "@/Styles/MealDetail.css";
-import { getRandomRecipe } from "../Hooks/ApiCalls.js";
+import { getRandomRecipeQueryOption } from "../Hooks/ApiCalls.js";
 import IngredientList from "../Components/IngredientsList.jsx";
 import StepList from "../Components/StepList.jsx";
 import { FavoriteButton } from "../Components/RecipeList.jsx";
+import { useQuery } from "@tanstack/react-query";
 
 export default function RandomMeal() {
-  const [recipe, setRecipe] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const {
+    data,
+    isPending: loading,
+    error,
+  } = useQuery(getRandomRecipeQueryOption());
 
-  useEffect(() => {
-    let isCancelled = false;
-
-    const fetchRecipes = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const data = await getRandomRecipe();
-        if (!isCancelled) {
-          setRecipe(data?.meals?.[0] || null);
-        }
-      } catch (err) {
-        if (!isCancelled) {
-          setError(err.message);
-        }
-      } finally {
-        if (!isCancelled) {
-          setLoading(false);
-        }
-      }
-    };
-
-    fetchRecipes();
-
-    return () => {
-      isCancelled = true;
-    };
-  }, []);
+  const recipe = data?.meals?.[0] || null;
 
   if (loading) {
     return <p>Loading recipe...</p>;

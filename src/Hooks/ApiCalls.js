@@ -1,8 +1,10 @@
+import { queryOptions, useQuery } from "@tanstack/react-query";
+
 // Free public sandbox key is '1'
 const API_KEY = "1";
 const BASE_URL = `https://themealdb.com/api/json/v1/${API_KEY}`;
 
-export const getRecipesBySearch = async (searchTerm, filter) => {
+const getRecipesBySearch = async (searchTerm, filter) => {
   filter = filter || "s"; // Default to search by name if no filter is provided
   const endpoint = filter === "s" ? "search.php" : "filter.php"; // Determine endpoint based on filter
 
@@ -17,7 +19,7 @@ export const getRecipesBySearch = async (searchTerm, filter) => {
   return data;
 };
 
-export const getRecipeById = async (id) => {
+const getRecipeById = async (id) => {
   const response = await fetch(`${BASE_URL}/lookup.php?i=${id}`);
 
   if (!response.ok) throw new Error("Network response failed");
@@ -27,7 +29,7 @@ export const getRecipeById = async (id) => {
   return data;
 };
 
-export const getRandomRecipe = async () => {
+const getRandomRecipe = async () => {
   const response = await fetch(`${BASE_URL}/random.php`);
 
   if (!response.ok) throw new Error("Network response failed");
@@ -37,7 +39,7 @@ export const getRandomRecipe = async () => {
   return data;
 };
 
-export const getAllCategories = async () => {
+const getAllCategories = async () => {
   const response = await fetch(`${BASE_URL}/categories.php`);
 
   if (!response.ok) throw new Error("Network response failed");
@@ -47,7 +49,7 @@ export const getAllCategories = async () => {
   return data;
 };
 
-export const getRecipesByCategory = async (category) => {
+const getRecipesByCategory = async (category) => {
   const response = await fetch(`${BASE_URL}/filter.php?c=${category}`);
 
   if (!response.ok) throw new Error("Network response failed");
@@ -56,3 +58,41 @@ export const getRecipesByCategory = async (category) => {
 
   return data;
 };
+
+export function getRecipesQueryOption(searchTerm, filter) {
+  return queryOptions({
+    queryKey: ["getRecipeBySearchKey", searchTerm, filter],
+    queryFn: () => getRecipesBySearch(searchTerm, filter),
+  });
+}
+
+export function getRecipesByCategoryQueryOption(category) {
+  return queryOptions({
+    queryKey: ["getRecipeByCategoriesKey", category],
+    queryFn: () => getRecipesByCategory(category),
+  });
+}
+
+export function getAllCategoriesQueryOption() {
+  return queryOptions({
+    queryKey: ["categoriesKey"],
+    queryFn: () => getAllCategories(),
+  });
+}
+
+export function getRecipeByIdQueryOption(id) {
+  return queryOptions({
+    queryKey: ["getRecipeByIdKey", id],
+    queryFn: () => getRecipeById(id),
+  });
+}
+
+export function getRandomRecipeQueryOption() {
+  return queryOptions({
+    queryKey: ["getRandomRecipeKey"],
+    queryFn: async () => {
+      const data = await getRandomRecipe();
+      return data;
+    },
+  });
+}

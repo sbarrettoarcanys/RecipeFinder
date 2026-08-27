@@ -10,6 +10,7 @@ import { ErrorBoundary } from "react-error-boundary";
 
 import Sidebar from "./App/Sidebar.jsx";
 import { FavoriteRecipeProvider } from "./Context/FavoriteRecipeContext.jsx";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 const HomePage = lazy(() => import("./App/HomePage"));
 const Favorites = lazy(() => import("./App/Favorites"));
@@ -17,20 +18,22 @@ const MealDetail = lazy(() => import("./App/MealDetail"));
 const Category = lazy(() => import("./App/Category"));
 const RandomMeal = lazy(() => import("./App/Random"));
 
+const queryClient = new QueryClient();
+
 createRoot(document.getElementById("root")).render(
   <BrowserRouter>
-    {/* add context provider here */}
-    <FavoriteRecipeProvider>
-      <PageLayout />
-    </FavoriteRecipeProvider>
-
-    {/* <PageLayout /> */}
+    <QueryClientProvider client={queryClient}>
+      <FavoriteRecipeProvider>
+        <PageLayout />
+      </FavoriteRecipeProvider>
+    </QueryClientProvider>
   </BrowserRouter>,
 );
 
 function PageLayout() {
   return (
     <>
+      {/* <StrictMode> */}
       <ErrorBoundary fallback={<div>Failed to load</div>}>
         <Sidebar />
         <Suspense fallback={<div>Loading...</div>}>
@@ -45,6 +48,7 @@ function PageLayout() {
           </main>
         </Suspense>
       </ErrorBoundary>
+      {/* </StrictMode> */}
     </>
   );
 }

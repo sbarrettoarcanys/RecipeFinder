@@ -19,7 +19,11 @@ const RecipeCard = memo(function RecipeCard({ recipe }) {
       <NavLink to={`/meal-detail/${recipe.idMeal}`} className="recipe-card">
         <div
           className="thumb"
-          style={{ backgroundImage: `url(${recipe.strMealThumb})` }}
+          role="img"
+          aria-label={recipe.strMeal}
+          style={{
+            backgroundImage: `url(${recipe.strMealThumb})`,
+          }}
         >
           <FavoriteButton recipe={recipe} />
 
