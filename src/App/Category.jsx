@@ -1,12 +1,16 @@
 import { useState, useEffect } from "react";
 import "@/Styles/HomePage.css";
 import { debounceInput } from "../Hooks/Debounce.js";
-import { getAllCategories, getRecipesByCategory } from "../Hooks/ApiCalls.js";
+import {
+  getAllCategoriesQueryOption,
+  getRecipesByCategoryQueryOption,
+} from "../Hooks/ApiCalls.js";
 import { RecipeList } from "../Components/RecipeList.jsx";
 import { SearchBar } from "../Components/SearchBar.jsx";
 import { FilterRecipes } from "../Components/FilterRecipes.jsx";
 
 import { useSearchParams } from "react-router";
+import { useQuery } from "@tanstack/react-query";
 
 function searchFromRecipes(searchTerm, recipes) {
   if (!searchTerm) return recipes ?? [];
@@ -26,108 +30,38 @@ export default function Homepage() {
 
   const debouncedSearch = debounceInput(search, 500);
 
-  const [categories, setCategories] = useState([]);
-  const [recipes, setRecipes] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-
   //get all categories
+  const { data: categoriesData } = useQuery(getAllCategoriesQueryOption());
+  const categories = categoriesData?.categories || [];
+
+  //get all recipes by category
+  const {
+    data: recipesData,
+    isPending: loading,
+    error,
+  } = useQuery(getRecipesByCategoryQueryOption(filter));
+
+  const recipes = searchFromRecipes(search, recipesData?.meals || []);
+
+  // keep the URL in sync with the debounced search/filter
   useEffect(() => {
-    let isCancelled = false;
-
-    const fetchCategories = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const data = await getAllCategories();
-        if (!isCancelled) {
-          setCategories(data?.categories || []);
-        }
-
-        setSearchParams((prevParams) => {
-          if (debouncedSearch) {
-            prevParams.set("search", debouncedSearch);
-          } else {
-            prevParams.delete("search");
-          }
-
-          if (!filter) {
-            prevParams.delete("filter");
-          } else {
-            prevParams.set("filter", filter); // Reset page when changing sort order
-          }
-
-          // 2. Return it to update the URL
-          return prevParams;
-        });
-      } catch (err) {
-        if (!isCancelled) {
-          setError(err.message);
-        }
-      } finally {
-        if (!isCancelled) {
-          setLoading(false);
-        }
+    setSearchParams((prevParams) => {
+      if (debouncedSearch) {
+        prevParams.set("search", debouncedSearch);
+      } else {
+        prevParams.delete("search");
       }
-    };
 
-    fetchCategories();
-
-    return () => {
-      isCancelled = true;
-    };
-  }, []);
-
-  //get all recipes by categories
-  useEffect(() => {
-    let isCancelled = false;
-
-    const fetchRecipesByCategories = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const data = await getRecipesByCategory(filter);
-        if (!isCancelled) {
-          // setRecipes(data?.meals || []);
-
-          const recipeData = await searchFromRecipes(search, data?.meals || []);
-
-          setRecipes(recipeData ?? []);
-        }
-
-        setSearchParams((prevParams) => {
-          if (debouncedSearch) {
-            prevParams.set("search", debouncedSearch);
-          } else {
-            prevParams.delete("search");
-          }
-
-          if (!filter || filter === "s") {
-            prevParams.delete("filter");
-          } else {
-            prevParams.set("filter", filter); // Reset page when changing sort order
-          }
-
-          // 2. Return it to update the URL
-          return prevParams;
-        });
-      } catch (err) {
-        if (!isCancelled) {
-          setError(err.message);
-        }
-      } finally {
-        if (!isCancelled) {
-          setLoading(false);
-        }
+      if (!filter || filter === "s") {
+        prevParams.delete("filter");
+      } else {
+        prevParams.set("filter", filter); // Reset page when changing sort order
       }
-    };
 
-    fetchRecipesByCategories();
-
-    return () => {
-      isCancelled = true;
-    };
-  }, [filter, debouncedSearch]);
+      // 2. Return it to update the URL
+      return prevParams;
+    });
+  }, [filter, debouncedSearch, setSearchParams]);
 
   return (
     <>
@@ -156,7 +90,7 @@ export default function Homepage() {
         <div className="recommended-grid">
           {loading && <p>Loading recipes...</p>}
 
-          {error && <p className="error">{error}</p>}
+          {error && <p className="error">{error.message}</p>}
 
           {recipes.length === 0 && !loading && !error && (
             <p>No results for this query.</p>

@@ -3,12 +3,13 @@ import "@/Styles/HomePage.css";
 import "@/Styles/App.css";
 
 import { debounceInput } from "../Hooks/Debounce.js";
-import { getRecipesBySearch } from "../Hooks/ApiCalls.js";
+import { getRecipesQueryOption } from "../Hooks/ApiCalls.js";
 import { RecipeList } from "../Components/RecipeList.jsx";
 import { SearchBar } from "../Components/SearchBar.jsx";
 import { HomeFilterRecipes } from "../Components/HomeFilterRecipes.jsx";
 
 import { useSearchParams } from "react-router";
+import { useQuery } from "@tanstack/react-query";
 
 export default function Homepage() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -18,55 +19,30 @@ export default function Homepage() {
 
   const debouncedSearch = debounceInput(search, 500);
 
-  const [recipes, setRecipes] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const {
+    data,
+    isPending: loading,
+    error,
+  } = useQuery(getRecipesQueryOption(debouncedSearch, filter));
+
+  const recipes = data?.meals || [];
 
   useEffect(() => {
-    let isCancelled = false;
-
-    const fetchRecipes = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const data = await getRecipesBySearch(debouncedSearch, filter);
-        if (!isCancelled) {
-          setRecipes(data?.meals || []);
-        }
-
-        setSearchParams((prevParams) => {
-          if (debouncedSearch) {
-            prevParams.set("search", debouncedSearch);
-          } else {
-            prevParams.delete("search");
-          }
-
-          if (!filter) {
-            prevParams.delete("filter");
-          } else {
-            prevParams.set("filter", filter); // Reset page when changing sort order
-          }
-
-          // 2. Return it to update the URL
-          return prevParams;
-        });
-      } catch (err) {
-        if (!isCancelled) {
-          setError(err.message);
-        }
-      } finally {
-        if (!isCancelled) {
-          setLoading(false);
-        }
+    setSearchParams((prevParams) => {
+      if (debouncedSearch) {
+        prevParams.set("search", debouncedSearch);
+      } else {
+        prevParams.delete("search");
       }
-    };
-
-    fetchRecipes();
-
-    return () => {
-      isCancelled = true;
-    };
-  }, [debouncedSearch, filter]);
+      if (!filter) {
+        prevParams.delete("filter");
+      } else {
+        prevParams.set("filter", filter); // Reset page when changing sort order
+      }
+      // 2. Return it to update the URL
+      return prevParams;
+    });
+  }, [debouncedSearch, filter, setSearchParams]);
 
   return (
     <>
@@ -77,7 +53,7 @@ export default function Homepage() {
         </div>
 
         <div style={{ display: "flex", gap: "1rem" }}>
-          <SearchBar search={debouncedSearch} onSearchChange={setSearch} />
+          <SearchBar search={search} onSearchChange={setSearch} />
           <HomeFilterRecipes filter={filter} onFilterChange={setFilter} />
         </div>
       </div>
@@ -89,7 +65,7 @@ export default function Homepage() {
         <div className="recommended-grid">
           {loading && <p>Loading recipes...</p>}
 
-          {error && <p className="error">{error}</p>}
+          {error && <p className="error">{error.message}</p>}
 
           {recipes.length === 0 && !loading && !error && (
             <p>No results for this query.</p>

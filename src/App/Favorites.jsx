@@ -1,13 +1,13 @@
 import { useState, useEffect } from "react";
 import "@/Styles/HomePage.css";
 import { debounceInput } from "../Hooks/Debounce.js";
-import { getRecipesBySearch } from "../Hooks/ApiCalls.js";
+import { getAllCategoriesQueryOption } from "../Hooks/ApiCalls.js";
 import { useFavoriteRecipeContext } from "../Context/FavoriteRecipeContext.jsx";
 import { RecipeList } from "../Components/RecipeList.jsx";
 import { SearchBar } from "../Components/SearchBar.jsx";
 import { FilterRecipes } from "../Components/FilterRecipes.jsx";
 import { useSearchParams } from "react-router";
-import { getAllCategories } from "../Hooks/ApiCalls.js";
+import { useQuery } from "@tanstack/react-query";
 
 export default function Favorites() {
   const { favoriteRecipes, searchFavoriteRecipe } = useFavoriteRecipeContext();
@@ -27,56 +27,11 @@ export default function Favorites() {
     strCategoryThumb: "",
     strCategoryDescription: "",
   };
-  const [filter, setFilter] = useState(searchParams.get("filter"));
-  const [categories, setCategories] = useState([defaultCategory]);
+  const [filter, setFilter] = useState(searchParams.get("filter") || "All");
 
   //get all categories
-  useEffect(() => {
-    let isCancelled = false;
-    console.log(categories[0]);
-
-    const fetchCategories = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const data = await getAllCategories();
-        if (!isCancelled) {
-          setCategories([defaultCategory, ...(data?.categories || [])]);
-        }
-
-        setSearchParams((prevParams) => {
-          if (debouncedSearch) {
-            prevParams.set("search", debouncedSearch);
-          } else {
-            prevParams.delete("search");
-          }
-
-          if (!filter) {
-            prevParams.delete("filter");
-          } else {
-            prevParams.set("filter", filter); // Reset page when changing sort order
-          }
-
-          // 2. Return it to update the URL
-          return prevParams;
-        });
-      } catch (err) {
-        if (!isCancelled) {
-          setError(err.message);
-        }
-      } finally {
-        if (!isCancelled) {
-          setLoading(false);
-        }
-      }
-    };
-
-    fetchCategories();
-
-    return () => {
-      isCancelled = true;
-    };
-  }, []);
+  const { data: categoriesData } = useQuery(getAllCategoriesQueryOption());
+  const categories = [defaultCategory, ...(categoriesData?.categories || [])];
 
   useEffect(() => {
     let isCancelled = false;

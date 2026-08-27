@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router";
 import "@/Styles/MealDetail.css";
-import { getRecipeById } from "../Hooks/ApiCalls.js";
+import { getRecipeByIdQueryOption } from "../Hooks/ApiCalls.js";
 import IngredientList from "../Components/IngredientsList.jsx";
 import StepList from "../Components/StepList.jsx";
 import { FavoriteButton } from "../Components/RecipeList.jsx";
+import { useQuery } from "@tanstack/react-query";
 
 export default function MealDetail() {
   const params = useParams();
@@ -12,41 +13,15 @@ export default function MealDetail() {
   if (!params || !params.id || params.id.trim() === "" || params.id == 0) {
     return <div className="meal-detail-error">Error: No recipe found.</div>;
   }
+  const id = params.id;
 
-  const [id, setId] = useState(params.id);
+  const {
+    data,
+    isPending: loading,
+    error,
+  } = useQuery(getRecipeByIdQueryOption(id));
 
-  const [recipe, setRecipe] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    let isCancelled = false;
-
-    const fetchRecipes = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const data = await getRecipeById(id);
-        if (!isCancelled) {
-          setRecipe(data?.meals?.[0] || null);
-        }
-      } catch (err) {
-        if (!isCancelled) {
-          setError(err.message);
-        }
-      } finally {
-        if (!isCancelled) {
-          setLoading(false);
-        }
-      }
-    };
-
-    fetchRecipes();
-
-    return () => {
-      isCancelled = true;
-    };
-  }, [id]);
+  const recipe = data?.meals?.[0] || null;
 
   if (loading) {
     return <p>Loading recipe...</p>;
