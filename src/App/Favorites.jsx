@@ -8,6 +8,7 @@ import { SearchBar } from "../Components/SearchBar.jsx";
 import { FilterRecipes } from "../Components/FilterRecipes.jsx";
 import { useSearchParams } from "react-router";
 import { useQuery } from "@tanstack/react-query";
+import { logError } from "../Utils/ErrorLogger.js";
 
 export default function Favorites() {
   const { favoriteRecipes, searchFavoriteRecipe } = useFavoriteRecipeContext();
@@ -30,8 +31,19 @@ export default function Favorites() {
   const [filter, setFilter] = useState(searchParams.get("filter") || "All");
 
   //get all categories
-  const { data: categoriesData } = useQuery(getAllCategoriesQueryOption());
+  const {
+    data: categoriesData,
+    error: categoriesError,
+    isPending: categoriesLoading,
+  } = useQuery(getAllCategoriesQueryOption());
   const categories = [defaultCategory, ...(categoriesData?.categories || [])];
+
+  if (categoriesError) {
+    logError(categoriesError, {
+      route: "Favorites",
+      Action: "searchFavoriteRecipe",
+    });
+  }
 
   useEffect(() => {
     let isCancelled = false;

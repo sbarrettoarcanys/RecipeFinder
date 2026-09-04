@@ -3,13 +3,18 @@ import "@/Styles/HomePage.css";
 import "@/Styles/App.css";
 
 import { debounceInput } from "../Hooks/Debounce.js";
-import { getRecipesQueryOption } from "../Hooks/ApiCalls.js";
+import {
+  getRecipesQueryOption,
+  getRecipeByIdQueryOption,
+} from "../Hooks/ApiCalls.js";
 import { RecipeList } from "../Components/RecipeList.jsx";
 import { SearchBar } from "../Components/SearchBar.jsx";
 import { HomeFilterRecipes } from "../Components/HomeFilterRecipes.jsx";
+import { SurpriseMeLink } from "../Components/SurpriseMeLink.jsx";
 
 import { useSearchParams } from "react-router";
 import { useQuery } from "@tanstack/react-query";
+import { logError } from "../Utils/ErrorLogger.js";
 
 export default function Homepage() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -24,6 +29,10 @@ export default function Homepage() {
     isPending: loading,
     error,
   } = useQuery(getRecipesQueryOption(debouncedSearch, filter));
+
+  if (error) {
+    logError(error, { route: "Homepage", Action: "getRecipesQueryOption" });
+  }
 
   const recipes = data?.meals || [];
 
@@ -61,6 +70,9 @@ export default function Homepage() {
       <div className="section">
         <div className="section-head">
           <h2>Recommended</h2>
+          <SurpriseMeLink>
+            <h1 className="see-all">Surprise Me! →</h1>
+          </SurpriseMeLink>
         </div>
         <div className="recommended-grid">
           {loading && <p>Loading recipes...</p>}

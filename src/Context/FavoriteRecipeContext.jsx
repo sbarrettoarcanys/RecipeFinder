@@ -7,6 +7,8 @@ import {
   useMemo,
 } from "react";
 
+import { getItem, setItem } from "../Utils/LocalStorage.js";
+
 const FavoriteRecipeContext = createContext(null);
 
 export const useFavoriteRecipeContext = () => useContext(FavoriteRecipeContext);
@@ -51,9 +53,7 @@ export const FavoriteRecipeProvider = ({ children }) => {
       const recipesByCategory =
         category && category !== "All"
           ? favoriteRecipes.filter((recipe) =>
-              recipe.strCategory
-                .toLowerCase()
-                .includes(category.toLowerCase()),
+              recipe.strCategory.toLowerCase().includes(category.toLowerCase()),
             )
           : favoriteRecipes;
 
@@ -89,20 +89,3 @@ export const FavoriteRecipeProvider = ({ children }) => {
     </FavoriteRecipeContext.Provider>
   );
 };
-
-//to extract to utils
-function setItem(key, value) {
-  try {
-    window.localStorage.setItem(key, JSON.stringify(value));
-  } catch (error) {
-    console.log(error);
-  }
-}
-function getItem(key) {
-  try {
-    const item = window.localStorage.getItem(key);
-    return item ? JSON.parse(item) : undefined;
-  } catch (error) {
-    console.log(error);
-  }
-}

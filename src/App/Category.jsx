@@ -11,6 +11,7 @@ import { FilterRecipes } from "../Components/FilterRecipes.jsx";
 
 import { useSearchParams } from "react-router";
 import { useQuery } from "@tanstack/react-query";
+import { logError } from "../Utils/ErrorLogger.js";
 
 function searchFromRecipes(searchTerm, recipes) {
   if (!searchTerm) return recipes ?? [];
@@ -40,6 +41,13 @@ export default function Homepage() {
     isPending: loading,
     error,
   } = useQuery(getRecipesByCategoryQueryOption(filter));
+
+  if (error) {
+    logError(error, {
+      route: "Category",
+      Action: "getRecipesByCategoryQueryOption",
+    });
+  }
 
   const recipes = searchFromRecipes(search, recipesData?.meals || []);
 
