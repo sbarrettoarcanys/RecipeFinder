@@ -3,6 +3,10 @@ import { useState, useEffect, memo } from "react";
 import { NavLink } from "react-router";
 import { useFavoriteRecipeContext } from "../Context/FavoriteRecipeContext.jsx";
 
+import { getRecipeByIdQueryOption } from "../Hooks/ApiCalls.js";
+import { useQueryClient } from "@tanstack/react-query";
+import { logError } from "../Utils/ErrorLogger.js";
+
 const RecipeList = memo(function RecipeList({ recipes }) {
   return (
     <>
@@ -14,8 +18,23 @@ const RecipeList = memo(function RecipeList({ recipes }) {
 });
 
 const RecipeCard = memo(function RecipeCard({ recipe }) {
+  //prefetch recipe data on hover, focus, or click to improve perceived performance
+  const queryClient = useQueryClient();
+  async function handlePrefetch(id) {
+    await queryClient.query(getRecipeByIdQueryOption(id)).catch((error) => {
+      logError(error, {
+        route: "RecipeList",
+        Action: "getRecipeByIdQueryOption",
+      });
+    });
+  }
+
   return (
-    <div>
+    <div
+      onMouseEnter={() => handlePrefetch(recipe.idMeal)}
+      onFocus={() => handlePrefetch(recipe.idMeal)}
+      onClick={() => handlePrefetch(recipe.idMeal)}
+    >
       <NavLink to={`/meal-detail/${recipe.idMeal}`} className="recipe-card">
         <div
           className="thumb"

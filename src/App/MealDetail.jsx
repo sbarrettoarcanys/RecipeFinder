@@ -6,6 +6,7 @@ import IngredientList from "../Components/IngredientsList.jsx";
 import StepList from "../Components/StepList.jsx";
 import { FavoriteButton } from "../Components/RecipeList.jsx";
 import { useQuery } from "@tanstack/react-query";
+import { logError } from "../Utils/ErrorLogger.js";
 
 export default function MealDetail() {
   const params = useParams();
@@ -28,6 +29,10 @@ export default function MealDetail() {
   }
 
   if (error) {
+    logError(error, {
+      route: "MealDetail",
+      Action: "getRecipeByIdQueryOption",
+    });
     return <p className="error">{error}</p>;
   }
 

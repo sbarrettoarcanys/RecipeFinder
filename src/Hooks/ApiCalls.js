@@ -63,6 +63,7 @@ export function getRecipesQueryOption(searchTerm, filter) {
   return queryOptions({
     queryKey: ["getRecipeBySearchKey", searchTerm, filter],
     queryFn: () => getRecipesBySearch(searchTerm, filter),
+    staleTime: 1000 * 60 * 5, // Keep fresh for 5 minutes
   });
 }
 
@@ -70,6 +71,7 @@ export function getRecipesByCategoryQueryOption(category) {
   return queryOptions({
     queryKey: ["getRecipeByCategoriesKey", category],
     queryFn: () => getRecipesByCategory(category),
+    staleTime: 1000 * 60 * 5, // Keep fresh for 5 minutes
   });
 }
 
@@ -77,6 +79,7 @@ export function getAllCategoriesQueryOption() {
   return queryOptions({
     queryKey: ["categoriesKey"],
     queryFn: () => getAllCategories(),
+    staleTime: 1000 * 60 * 5, // Keep fresh for 5 minutes
   });
 }
 
@@ -84,6 +87,7 @@ export function getRecipeByIdQueryOption(id) {
   return queryOptions({
     queryKey: ["getRecipeByIdKey", id],
     queryFn: () => getRecipeById(id),
+    staleTime: 1000 * 60 * 5, // Keep fresh for 5 minutes
   });
 }
 
@@ -94,5 +98,6 @@ export function getRandomRecipeQueryOption() {
       const data = await getRandomRecipe();
       return data;
     },
+    staleTime: 1000 * 60 * 5, // Keep fresh for 5 minutes
   });
 }

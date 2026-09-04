@@ -1,11 +1,10 @@
-import { useState, useEffect } from "react";
-import { useParams } from "react-router";
 import "@/Styles/MealDetail.css";
 import { getRandomRecipeQueryOption } from "../Hooks/ApiCalls.js";
 import IngredientList from "../Components/IngredientsList.jsx";
 import StepList from "../Components/StepList.jsx";
 import { FavoriteButton } from "../Components/RecipeList.jsx";
 import { useQuery } from "@tanstack/react-query";
+import { logError } from "../Utils/ErrorLogger.js";
 
 export default function RandomMeal() {
   const {
@@ -21,6 +20,8 @@ export default function RandomMeal() {
   }
 
   if (error) {
+    logError(error, { route: "Random", Action: "getRandomRecipeQueryOption" });
+
     return <p className="error">{error}</p>;
   }
 

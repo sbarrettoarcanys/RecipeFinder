@@ -1,5 +1,6 @@
 import "@/Styles/HomePage.css";
 import { NavLink } from "react-router";
+import { SurpriseMeLink } from "../Components/SurpriseMeLink.jsx";
 export default function SideBar() {
   return (
     <>
@@ -68,7 +69,7 @@ export default function SideBar() {
               </svg>
             </div>
           </NavLink>
-          <NavLink className="nav-btn" to="/random" reloadDocument={true}>
+          <SurpriseMeLink>
             <div title="Random">
               <svg
                 width="20"
@@ -83,7 +84,7 @@ export default function SideBar() {
                 <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 11c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z" />
               </svg>
             </div>
-          </NavLink>
+          </SurpriseMeLink>
 
           <div className="nav-btn" title="Settings">
             <svg
