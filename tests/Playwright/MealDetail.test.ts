@@ -1,0 +1,120 @@
+import { test, expect } from "@playwright/test";
+test.describe("Meal Detail", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto("http://localhost:5173/");
+
+    // Wait for the recipe cards to be visible
+    await page.waitForSelector(".recipe-card");
+  });
+
+  test("should display meal details when a recipe card is clicked", async ({
+    page,
+  }) => {
+    // Click on the first recipe card
+    await page.click(".recipe-card");
+
+    //check if the page contains the meal details
+    await expect(page.locator(".meal-detail")).toBeVisible();
+
+    await expect(page.locator(".meal-detail-image")).toBeVisible();
+
+    await expect(page.locator(".meal-detail-body")).toBeVisible();
+  });
+
+  test("should display error message when meal details are not found", async ({
+    page,
+  }) => {
+    //navigate to a non-existing meal detail page
+    await page.goto("http://localhost:5173/meal-detail/533229");
+
+    // Wait for the meal details to load
+    await page.waitForSelector(".meal-detail-error");
+
+    // Check if the error message is displayed
+    await expect(page.locator(".meal-detail-error")).toHaveText(
+      "Error: No recipe found.",
+    );
+  });
+
+  test("Back button return to previous page with URL", async ({ page }) => {
+    // Select the "Ingredient" filter
+    await page.waitForSelector("#ingredient");
+    await page.click("#ingredient");
+
+    // Set search bar to chicken
+    await page.waitForSelector("#search-input");
+    await page.fill("#search-input", "chicken");
+
+    // Wait for the recipe cards to be visible
+    // await page.waitForSelector(".recipe-card");
+    await page.waitForURL(/search=chicken/);
+
+    // Click on the first recipe card
+    await page.click(".recipe-card");
+
+    //wait for back button to be visible
+    await page.waitForSelector("#backBtn");
+
+    //click back button
+    await page.click("#backBtn");
+
+    // Wait for the recipe cards to be visible
+    await page.waitForSelector(".recipe-card");
+
+    //check if the URL contains the filters
+    await expect(page).toHaveURL((url) => {
+      const params = url.searchParams;
+      return (
+        params.has("search") &&
+        params.has("filter") &&
+        params.get("search") === "chicken" &&
+        params.get("filter") === "i"
+      );
+    });
+  });
+
+  test("should save a recipe to favorites when the favorite button is clicked", async ({
+    page,
+  }) => {
+    // Click on the first recipe card
+    await page.click(".recipe-card");
+
+    // Wait for the meal details to load
+    await page.waitForSelector(".meal-detail-favorite");
+
+    // Click on the favorite button of the first recipe card
+    await page.getByRole("button", { name: "Favorite" }).click();
+
+    // Check if the recipe is saved in localStorage
+    const favorites = await page.evaluate(() => {
+      return JSON.parse(localStorage.getItem("favoriteRecipes") || "[]");
+    });
+    await expect(favorites).toHaveLength(1);
+  });
+
+  test("should remove favorite recipe when clicking favorite recipe", async ({
+    page,
+  }) => {
+    // Click on the first recipe card
+    await page.click(".recipe-card");
+
+    // Wait for the meal details to load
+    await page.waitForSelector(".meal-detail-favorite");
+
+    // Click on the favorite button of the first recipe card
+    await page.getByRole("button", { name: "Favorite" }).click();
+
+    // Check if the recipe is saved in localStorage
+    const favorites = await page.evaluate(() => {
+      return JSON.parse(localStorage.getItem("favoriteRecipes") || "[]");
+    });
+    await expect(favorites).toHaveLength(1);
+
+    await page.getByRole("button", { name: "Favorite" }).click();
+
+    const newFavorites = await page.evaluate(() => {
+      return JSON.parse(localStorage.getItem("favoriteRecipes") || "[]");
+    });
+    await expect(newFavorites).toHaveLength(0);
+  });
+});

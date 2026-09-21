@@ -29,6 +29,7 @@ export const SurpriseMeLink = memo(function SurpriseMeLink({
       onMouseEnter={prefetch}
       onFocus={prefetch}
       onClick={prefetch}
+      id="randomNav"
     >
       {children}
     </NavLink>

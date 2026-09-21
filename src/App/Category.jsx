@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import "@/Styles/HomePage.css";
-import { debounceInput } from "../Hooks/Debounce.js";
+import { useDebounce } from "../Hooks/Debounce.js";
 import {
   getAllCategoriesQueryOption,
   getRecipesByCategoryQueryOption,
@@ -29,7 +29,7 @@ export default function Homepage() {
   const [search, setSearch] = useState(searchParams.get("search") || "");
   const [filter, setFilter] = useState(searchParams.get("filter") || "Beef");
 
-  const debouncedSearch = debounceInput(search, 500);
+  const debouncedSearch = useDebounce(search, 500);
 
   //get all categories
   const { data: categoriesData } = useQuery(getAllCategoriesQueryOption());
@@ -91,9 +91,6 @@ export default function Homepage() {
       <div className="section">
         <div className="section-head">
           <h2>Recommended</h2>
-          <a className="see-all" href="#">
-            See all →
-          </a>
         </div>
         <div className="recommended-grid">
           {loading && <p>Loading recipes...</p>}

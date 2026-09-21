@@ -9,6 +9,7 @@ function FilterRecipesImpl({ filter, onFilterChange, categoryFilters }) {
         {categoryFilters.map((filter) => (
           <div
             key={filter.idCategory}
+            id={filter.strCategory}
             className={`pill ${activeFilter === filter.strCategory ? "active" : ""}`}
             onClick={() => {
               setActiveFilter(filter.strCategory);

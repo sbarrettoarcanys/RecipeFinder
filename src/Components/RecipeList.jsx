@@ -1,5 +1,5 @@
 import "@/Styles/HomePage.css";
-import { useState, useEffect, memo } from "react";
+import { memo } from "react";
 import { NavLink } from "react-router";
 import { useFavoriteRecipeContext } from "../Context/FavoriteRecipeContext.jsx";
 
@@ -38,6 +38,7 @@ const RecipeCard = memo(function RecipeCard({ recipe }) {
       <NavLink to={`/meal-detail/${recipe.idMeal}`} className="recipe-card">
         <div
           className="thumb"
+          name={recipe.strMeal}
           role="img"
           aria-label={recipe.strMeal}
           style={{

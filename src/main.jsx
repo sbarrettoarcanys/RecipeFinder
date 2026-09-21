@@ -1,4 +1,4 @@
-import { StrictMode, Suspense, lazy, createContext, useContext } from "react";
+import { Suspense, lazy } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter, Routes, Route } from "react-router";
 import { ErrorBoundary } from "react-error-boundary";
@@ -19,6 +19,11 @@ const Category = lazy(() => import("./App/Category"));
 const RandomMeal = lazy(() => import("./App/Random"));
 
 const queryClient = new QueryClient();
+
+// Expose queryClient to the browser window for Playwright
+if (import.meta.env.DEV || window.isPlaywright) {
+  window.queryClient = queryClient;
+}
 
 createRoot(document.getElementById("root")).render(
   <BrowserRouter>

@@ -11,17 +11,14 @@ import { getItem, setItem } from "../Utils/LocalStorage.js";
 
 const FavoriteRecipeContext = createContext(null);
 
+// eslint-disable-next-line react-refresh/only-export-components -- context hook lives alongside its provider
 export const useFavoriteRecipeContext = () => useContext(FavoriteRecipeContext);
 
 export const FavoriteRecipeProvider = ({ children }) => {
-  const [favoriteRecipes, setFavoriteRecipes] = useState([]);
-
-  //setting state if there are stored favorite recipes
-  useEffect(() => {
-    const storedFavoriteRecipes = getItem("favoriteRecipes");
-
-    if (storedFavoriteRecipes) setFavoriteRecipes(storedFavoriteRecipes);
-  }, []);
+  //initializing state from any stored favorite recipes
+  const [favoriteRecipes, setFavoriteRecipes] = useState(
+    () => getItem("favoriteRecipes") || [],
+  );
 
   //saving of favorite recipes to localStorage
   useEffect(() => {
@@ -53,7 +50,9 @@ export const FavoriteRecipeProvider = ({ children }) => {
       const recipesByCategory =
         category && category !== "All"
           ? favoriteRecipes.filter((recipe) =>
-              recipe.strCategory.toLowerCase().includes(category.toLowerCase()),
+              recipe.strCategory
+                ?.toLowerCase()
+                .includes(category.toLowerCase()),
             )
           : favoriteRecipes;
 
