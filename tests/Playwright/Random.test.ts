@@ -4,17 +4,18 @@ test.describe("Random Meal", () => {
     await page.goto("http://localhost:5173/");
 
     // Wait for the recipe cards to be visible
-    await page.waitForSelector(".recipe-card");
+    const recipeCardsLocator = await page.locator(".recipe-card");
+    await expect(recipeCardsLocator.first()).toBeVisible();
   });
 
   test("Should redirect to Random page when clicking Surprise Me button", async ({
     page,
   }) => {
     // Wait for the 'Surprise Me' link to be visible
-    await page.waitForSelector("#surprise-me");
+    const surpriseMeBtn = await page.locator("#surprise-me");
 
     // Click on the 'Surprise Me' link
-    await page.click("#surprise-me");
+    await surpriseMeBtn.click();
     // Check if the URL contains '/random'
     await expect(page).toHaveURL(/\/random/);
   });
@@ -23,10 +24,10 @@ test.describe("Random Meal", () => {
     page,
   }) => {
     // Wait for the random in navbar to be visible
-    await page.waitForSelector("#randomNav");
+    const randomNavBtn = await page.locator("#randomNav");
 
     // Click on the random icon in navbar
-    await page.click("#randomNav");
+    await randomNavBtn.click();
 
     // Check if the URL contains '/random'
     await expect(page).toHaveURL(/\/random/);
@@ -48,25 +49,25 @@ test.describe("Random Meal", () => {
     await page.goto("http://localhost:5173/random");
 
     // Wait for the error message to be visible
-    await page.waitForSelector(".meal-detail-error");
+    const mealDetailError = await page.locator(".meal-detail-error");
+    await expect(mealDetailError).toBeVisible();
 
     // Check if the error message is displayed
-    await expect(page.locator(".meal-detail-error")).toHaveText(
-      "Error: No recipe found.",
-    );
+    await expect(mealDetailError).toHaveText("Error: No recipe found.");
   });
 
   test("should save a recipe to favorites when the favorite button is clicked", async ({
     page,
   }) => {
     // Wait for the random in navbar to be visible
-    await page.waitForSelector("#randomNav");
+    const randomNavBtn = await page.locator("#randomNav");
 
     // Click on the random icon in navbar
-    await page.click("#randomNav");
+    await randomNavBtn.click();
 
     // Wait for the meal details to load
-    await page.waitForSelector(".meal-detail-favorite");
+    const mealDetailFavorite = await page.locator(".meal-detail-favorite");
+    await expect(mealDetailFavorite).toBeVisible();
 
     // Click on the favorite button of the first recipe card
     await page.getByRole("button", { name: "Favorite" }).click();
@@ -82,13 +83,14 @@ test.describe("Random Meal", () => {
     page,
   }) => {
     // Wait for the random in navbar to be visible
-    await page.waitForSelector("#randomNav");
+    const randomNavBtn = await page.locator("#randomNav");
 
     // Click on the random icon in navbar
-    await page.click("#randomNav");
+    await randomNavBtn.click();
 
     // Wait for the meal details to load
-    await page.waitForSelector(".meal-detail-favorite");
+    const mealDetailFavorite = await page.locator(".meal-detail-favorite");
+    await expect(mealDetailFavorite).toBeVisible();
 
     // Click on the favorite button of the first recipe card
     await page.getByRole("button", { name: "Favorite" }).click();
@@ -109,31 +111,33 @@ test.describe("Random Meal", () => {
 
   test("Back button return to previous page with URL", async ({ page }) => {
     // Select the "Ingredient" filter
-    await page.waitForSelector("#ingredient");
-    await page.click("#ingredient");
+    const ingredientBtn = await page.locator("#ingredient");
+    await ingredientBtn.click();
 
     // Set search bar to chicken
-    await page.waitForSelector("#search-input");
-    await page.fill("#search-input", "chicken");
+    const searchInput = await page.locator("#search-input");
+    await searchInput.fill("chicken");
 
-    // Wait for the recipe cards to be visible
-    // await page.waitForSelector(".recipe-card");
+    // Wait for redirect
     await page.waitForURL(/search=chicken/);
 
     // Wait for the random in navbar to be visible
-    await page.waitForSelector("#randomNav");
+    const randomNavBtn = await page.locator("#randomNav");
+    await expect(randomNavBtn).toBeVisible();
 
     // Click on the random icon in navbar
-    await page.click("#randomNav");
+    await randomNavBtn.click();
 
     //wait for back button to be visible
-    await page.waitForSelector("#backBtn");
+    const backBtn = await page.locator("#backBtn");
+    await expect(backBtn).toBeVisible();
 
     //click back button
-    await page.click("#backBtn");
+    await backBtn.click();
 
     // Wait for the recipe cards to be visible
-    await page.waitForSelector(".recipe-card");
+    const recipeCard = await page.locator(".recipe-card").first();
+    await expect(recipeCard).toBeVisible();
 
     //check if the URL contains the filters
     await expect(page).toHaveURL((url) => {

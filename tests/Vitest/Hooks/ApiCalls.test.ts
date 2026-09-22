@@ -1,4 +1,4 @@
-import { expect, it, describe, beforeEach, vi } from "vitest";
+import { expect, it, describe, beforeEach, afterEach, vi } from "vitest";
 import { createElement, type ReactNode } from "react";
 import {
   getRandomRecipeQueryOption,
@@ -22,6 +22,10 @@ beforeEach(() => {
   queryClient = new QueryClient({
     defaultOptions: { queries: { retry: false } },
   });
+});
+
+afterEach(() => {
+  vi.unstubAllGlobals();
 });
 
 describe("getRandomRecipeQueryOption", () => {
@@ -97,10 +101,7 @@ describe("getRecipesQueryOption", () => {
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
 
-    console.log(result.current);
-    console.log(result.current.data);
-
-    expect(result.current.error).is.null;
+    expect(result.current.error).toBeNull();
     expect(fetch).toHaveBeenCalledWith(expect.stringContaining("/search.php"));
   });
 
@@ -115,11 +116,9 @@ describe("getRecipesQueryOption", () => {
     await waitFor(() => expect(result.current.isSuccess).toBe(true), {
       timeout: 5000,
     });
-    console.log(result.current);
-    console.log(result.current.data);
 
-    expect(result.current.error).is.null;
-    expect(result.current.data).is.not.null;
+    expect(result.current.error).toBeNull();
+    expect(result.current.data).not.toBeNull();
   });
 
   it("returns an error when search fetching fails", async () => {
@@ -140,7 +139,7 @@ describe("getRecipesQueryOption", () => {
     await waitFor(() => expect(result.current.isError).toBe(true));
 
     expect(result.current.error).toBeInstanceOf(Error);
-    expect(result.current.error).is.not.null;
+    expect(result.current.error).not.toBeNull();
 
     expect(fetch).toHaveBeenCalledWith(expect.stringContaining("/search.php"));
   });
@@ -158,11 +157,9 @@ describe("getRecipesByCategoryQueryOption", () => {
     await waitFor(() => expect(result.current.isSuccess).toBe(true), {
       timeout: 5000,
     });
-    console.log(result.current);
-    console.log(result.current.data);
 
-    expect(result.current.error).is.null;
-    expect(result.current.data).is.not.null;
+    expect(result.current.error).toBeNull();
+    expect(result.current.data).not.toBeNull();
   });
 
   it("returns an error when fetching meals by category fails", async () => {
@@ -183,11 +180,12 @@ describe("getRecipesByCategoryQueryOption", () => {
     await waitFor(() => expect(result.current.isError).toBe(true));
 
     expect(result.current.error).toBeInstanceOf(Error);
-    expect(result.current.error).is.not.null;
+    expect(result.current.error).not.toBeNull();
 
     expect(fetch).toHaveBeenCalledWith(expect.stringContaining("/filter.php"));
   });
 });
+
 describe("getAllCategoriesQueryOption", () => {
   it("returns data from category endpoint", async () => {
     const { result } = renderHook(
@@ -200,11 +198,9 @@ describe("getAllCategoriesQueryOption", () => {
     await waitFor(() => expect(result.current.isSuccess).toBe(true), {
       timeout: 5000,
     });
-    console.log(result.current);
-    console.log(result.current.data);
 
-    expect(result.current.error).is.null;
-    expect(result.current.data).is.not.null;
+    expect(result.current.error).toBeNull();
+    expect(result.current.data).not.toBeNull();
   });
 
   it("returns an error when fetching meals by category fails", async () => {
@@ -225,7 +221,7 @@ describe("getAllCategoriesQueryOption", () => {
     await waitFor(() => expect(result.current.isError).toBe(true));
 
     expect(result.current.error).toBeInstanceOf(Error);
-    expect(result.current.error).is.not.null;
+    expect(result.current.error).not.toBeNull();
 
     expect(fetch).toHaveBeenCalledWith(
       expect.stringContaining("/categories.php"),
@@ -244,11 +240,9 @@ describe("getRecipeByIdQueryOption", () => {
     await waitFor(() => expect(result.current.isSuccess).toBe(true), {
       timeout: 5000,
     });
-    console.log(result.current);
-    console.log(result.current.data);
 
-    expect(result.current.error).is.null;
-    expect(result.current.data).is.not.null;
+    expect(result.current.error).toBeNull();
+    expect(result.current.data).not.toBeNull();
   });
 
   it("returns an error when fetching meals by category fails", async () => {
@@ -269,7 +263,7 @@ describe("getRecipeByIdQueryOption", () => {
     await waitFor(() => expect(result.current.isError).toBe(true));
 
     expect(result.current.error).toBeInstanceOf(Error);
-    expect(result.current.error).is.not.null;
+    expect(result.current.error).not.toBeNull();
 
     expect(fetch).toHaveBeenCalledWith(expect.stringContaining("/lookup.php"));
   });

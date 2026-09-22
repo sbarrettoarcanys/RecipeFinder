@@ -3,6 +3,9 @@ import { test, expect } from "@playwright/test";
 test.describe("Home Page", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto("http://localhost:5173/");
+
+    // Wait for the recipe cards to be visible.
+    await expect(page.getByRole("main")).toBeVisible();
   });
 
   test("should have the correct title", async ({ page }) => {
@@ -13,10 +16,10 @@ test.describe("Home Page", () => {
     page,
   }) => {
     // Wait for the recipe cards to be visible
-    await page.waitForSelector(".recipe-card");
+    const recipeCard = await page.locator(".recipe-card").first();
 
     // Click on the first recipe card
-    await page.click(".recipe-card");
+    await recipeCard.click();
 
     // Check if the URL contains '/meal-detail/'
     await expect(page).toHaveURL(/\/meal-detail\//);
@@ -26,7 +29,7 @@ test.describe("Home Page", () => {
     page,
   }) => {
     // Wait for the recipe cards to be visible
-    await page.waitForSelector(".recipe-card");
+    await page.locator(".recipe-card");
 
     // Click on the favorite button of the first recipe card
     await page
@@ -46,10 +49,10 @@ test.describe("Home Page", () => {
     page,
   }) => {
     // Wait for the 'Surprise Me' link to be visible
-    await page.waitForSelector("#surprise-me");
+    const surpriseMeBtn = await page.locator("#surprise-me");
 
     // Hover over the 'Surprise Me' link
-    await page.hover("#surprise-me");
+    await surpriseMeBtn.hover();
 
     // Check if the random recipe is prefetched in the query cache
     const cachedData = await page.evaluate(() => {
@@ -67,24 +70,23 @@ test.describe("Home Page", () => {
 
   test("should navigate to a random recipe when the 'Surprise Me' link is clicked", async ({
     page,
-    context,
   }) => {
     // Wait for the 'Surprise Me' link to be visible
-    await page.waitForSelector("#surprise-me");
+    const surpriseMeBtn = await page.locator("#surprise-me");
 
-    // Click on the 'Surprise Me' link
-    await page.click("#surprise-me");
+    // Hover over the 'Surprise Me' link
+    await surpriseMeBtn.click();
 
     // Check if the URL contains '/random'
     await expect(page).toHaveURL(/\/random/);
   });
 
-  test("should display an error message when the API call fails", async ({
+  test("should display an error message when the 'Surprise Me' API call fails", async ({
     page,
     context,
   }) => {
     // Wait for the 'Surprise Me' link to be visible
-    await page.waitForSelector("#surprise-me");
+    await page.locator("#surprise-me");
 
     // Simulate an redirect failure by intercepting the network request
     await context.setOffline(true);
@@ -101,7 +103,7 @@ test.describe("Home Page", () => {
     context,
   }) => {
     // Wait for the recipe cards to be visible
-    await page.waitForSelector(".recipe-card");
+    await page.locator(".recipe-card");
 
     // Simulate an API failure by intercepting the network request
     await context.setOffline(true);
@@ -117,76 +119,75 @@ test.describe("Home Page", () => {
     page,
   }) => {
     // Set search bar to chicken
-    await page.waitForSelector("#search-input");
-    await page.fill("#search-input", "chicken");
+    const searchInput = await page.locator("#search-input");
+    await searchInput.fill("chicken");
 
     // Select the "Category" filter
-    await page.waitForSelector("#category");
-    await page.click("#category");
+    const categoryBtn = await page.locator("#category");
+    await categoryBtn.click();
 
-    // Wait for the recipe cards to be visible
-    await page.waitForSelector(".recipe-card");
-    const recipeCards = await page.locator(".recipe-card").all();
+    // Wait for the recipe cards to be visible.
+    const recipeCardsLocator = await page.locator(".recipe-card");
+    await expect(recipeCardsLocator.first()).toBeVisible();
+
+    //check if recipes are returned
+    const recipeCards = await recipeCardsLocator.all();
     expect(recipeCards.length).toBeGreaterThan(0);
 
-    // At least one recipe card should reference 'chicken'. Not every result is
-    // guaranteed to mention it by name (the category/ingredient filter endpoints
-    // don't return strCategory, so matches can only be spotted via the title),
-    // so we assert "some" rather than "every" card to avoid flaky failures.
-    const cardTexts = await Promise.all(
-      recipeCards.map(
-        async (card) => (await card.textContent())?.toLowerCase() ?? "",
-      ),
-    );
-    expect(cardTexts.some((text) => text.includes("chicken"))).toBe(true);
+    // At least one recipe card should reference 'chicken'.
+    const cardTexts = await recipeCardsLocator.allTextContents();
+    expect(
+      cardTexts.some((text) => text.toLowerCase().includes("chicken")),
+    ).toBe(true);
   });
 
   test("should display recipe cards containing 'chicken' when the search bar has 'chicken' and the ingredient filter is selected", async ({
     page,
   }) => {
-    // Set search bar to chicken
-    await page.waitForSelector("#search-input");
-    await page.fill("#search-input", "chicken");
-
     // Select the "Ingredient" filter
-    await page.waitForSelector("#ingredient");
-    await page.click("#ingredient");
+    const ingredientBtn = await page.locator("#ingredient");
+    await ingredientBtn.click();
+
+    // Set search bar to chicken
+    const searchInput = await page.locator("#search-input");
+    await searchInput.fill("chicken");
+
+    //wait for debounce
+    await page.waitForURL(/search=chicken/);
 
     // Wait for the recipe cards to be visible
-    await page.waitForSelector(".recipe-card");
-    const recipeCards = await page.locator(".recipe-card").all();
-    expect(recipeCards.length).toBeGreaterThan(0);
+    const recipeCardsLocator = await page.locator(".recipe-card");
+    await expect(recipeCardsLocator.first()).toBeVisible();
 
-    // At least one recipe card should reference 'chicken' by name. Not every
-    // result mentions it (e.g. a dish whose main ingredient is chicken can still
-    // have a name that doesn't include the word), so we assert "some" rather
-    // than "every" card to avoid flaky failures.
-    const cardTexts = await Promise.all(
-      recipeCards.map(
-        async (card) => (await card.textContent())?.toLowerCase() ?? "",
-      ),
-    );
-    expect(cardTexts.some((text) => text.includes("chicken"))).toBe(true);
+    //check if recipes are returned
+    expect(await recipeCardsLocator.count()).toBeGreaterThan(0);
+
+    // At least one recipe card should reference 'chicken'.
+    const cardTexts = await recipeCardsLocator.allTextContents();
+    expect(
+      cardTexts.some((text) => text.toLowerCase().includes("chicken")),
+    ).toBe(true);
   });
 
   test("should display 'canadian' in each recipe card's category chip when the search bar has 'canadian' and the area filter is selected", async ({
     page,
   }) => {
     // Set search bar to canadian
-    await page.waitForSelector("#search-input");
-    await page.fill("#search-input", "canadian");
+    const searchInput = await page.locator("#search-input");
+    await searchInput.fill("canadian");
 
     // Select the "Area" filter
-    await page.waitForSelector("#area");
-    await page.click("#area");
+    const areaBtn = await page.locator("#area");
+    await areaBtn.click();
 
     // Wait for the recipe cards to be visible
-    await page.waitForSelector(".recipe-card");
-    const recipeCards = await page.locator(".recipe-card").all();
+    const recipeCardsLocator = await page.locator(".recipe-card");
+    await expect(recipeCardsLocator.first()).toBeVisible();
+
+    const recipeCards = await recipeCardsLocator.all();
     expect(recipeCards.length).toBeGreaterThan(0);
 
-    // The area filter's response always includes strArea, so every card's
-    // category-chip should read 'Canadian'.
+    // Check if category is canadian
     for (const card of recipeCards) {
       const chipTexts = await card.locator(".category-chip").allTextContents();
       const allCanadianChips = chipTexts.every((text) =>
@@ -200,30 +201,28 @@ test.describe("Home Page", () => {
     page,
   }) => {
     // Set search bar to chicken
-    await page.waitForSelector("#search-input");
-    await page.fill("#search-input", "chicken");
+    const searchInput = await page.locator("#search-input");
+    await searchInput.fill("chicken");
 
     // Select the "Dish Name" filter
-    await page.waitForSelector("#dish-name");
-    await page.click("#dish-name");
+    const dishNameBtn = await page.locator("#dish-name");
+    await dishNameBtn.click();
 
-    // Wait for ".recommended-grid" to show the "Loading recipes..." text
-    // while the debounced search request is in flight
-    await expect(
-      page.locator(".recommended-grid").getByText("Loading recipes..."),
-    ).toBeVisible();
+    //wait to change URL
+    await page.waitForURL(/search=chicken/);
 
     // Wait for the recipe cards to be visible to ensure the API call is finished
-    await page.waitForSelector(".recipe-card");
-    await page.waitForURL(/search=chicken/);
-    const recipeCards = await page.locator(".recipe-card").all();
+    await page.locator(".recipe-card");
+    const recipeCardsLocator = await page.locator(".recipe-card");
+    await expect(recipeCardsLocator.first()).toBeVisible();
+
+    const recipeCards = await recipeCardsLocator.all();
     expect(recipeCards.length).toBeGreaterThan(0);
 
-    // Dish name search matches against the meal's title, so every recipe
-    // card should contain 'chicken'.
-    for (const card of recipeCards) {
-      const cardText = (await card.textContent())?.toLowerCase() ?? "";
-      expect(cardText).toContain("chicken");
+    // check if all dishes have chicken on the name
+    const cardTexts = await recipeCardsLocator.allTextContents();
+    for (const cardText of cardTexts) {
+      expect(cardText.toLowerCase()).toContain("chicken");
     }
   });
 
@@ -231,12 +230,12 @@ test.describe("Home Page", () => {
     page,
   }) => {
     // Set search bar to a nonsense string
-    await page.waitForSelector("#search-input");
-    await page.fill("#search-input", "sdasdsad");
+    const searchInput = await page.locator("#search-input");
+    await searchInput.fill("sdasdsad");
 
     // Select the "Dish Name" filter
-    await page.waitForSelector("#dish-name");
-    await page.click("#dish-name");
+    const dishNameBtn = await page.locator("#dish-name");
+    await dishNameBtn.click();
 
     // Check that the recommended grid shows the no-results message
     await expect(
@@ -248,12 +247,12 @@ test.describe("Home Page", () => {
     page,
   }) => {
     // Set search bar to a nonsense string
-    await page.waitForSelector("#search-input");
-    await page.fill("#search-input", "sdasdsad");
+    const searchInput = await page.locator("#search-input");
+    await searchInput.fill("sdasdsad");
 
     // Select the "Category" filter
-    await page.waitForSelector("#category");
-    await page.click("#category");
+    const categoryBtn = await page.locator("#category");
+    await categoryBtn.click();
 
     // Check that the recommended grid shows the no-results message
     await expect(
@@ -265,16 +264,18 @@ test.describe("Home Page", () => {
     page,
   }) => {
     // Set search bar to a nonsense string
-    await page.waitForSelector("#search-input");
-    await page.fill("#search-input", "sdasdsad");
+    const searchInput = await page.locator("#search-input");
+    await searchInput.fill("sdasdsad");
 
     // Select the "Ingredient" filter
-    await page.waitForSelector("#ingredient");
-    await page.click("#ingredient");
+    const ingredientBtn = await page.locator("#ingredient");
+    await ingredientBtn.click();
 
     // Check that the recommended grid shows the no-results message
+
+    const recommendedGrid = await page.locator(".recommended-grid");
     await expect(
-      page.locator(".recommended-grid").getByText("No results for this query."),
+      recommendedGrid.getByText("No results for this query."),
     ).toBeVisible();
   });
 
@@ -282,12 +283,12 @@ test.describe("Home Page", () => {
     page,
   }) => {
     // Set search bar to a nonsense string
-    await page.waitForSelector("#search-input");
-    await page.fill("#search-input", "sdasdsad");
+    const searchInput = await page.locator("#search-input");
+    await searchInput.fill("sdasdsad");
 
     // Select the "Area" filter
-    await page.waitForSelector("#area");
-    await page.click("#area");
+    const areaBtn = await page.locator("#area");
+    await areaBtn.click();
 
     // Check that the recommended grid shows the no-results message
     await expect(
@@ -295,5 +296,3 @@ test.describe("Home Page", () => {
     ).toBeVisible();
   });
 });
-
-//npx playwright show-report

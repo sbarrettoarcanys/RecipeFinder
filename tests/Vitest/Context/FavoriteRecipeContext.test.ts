@@ -233,7 +233,7 @@ describe("FavoriteRecipeContext", () => {
       recipes = result.current.searchFavoriteRecipe("satee", null);
     });
 
-    let resultMeal: Meal = {
+    const resultMeal: Meal = {
       idMeal: "53443",
       strMeal: "Satee",
       strCategory: "Beef",

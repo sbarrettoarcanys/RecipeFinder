@@ -4,17 +4,17 @@ test.describe("Category", () => {
     await page.goto("http://localhost:5173/category?filter=Beef");
 
     // Wait for the recipe cards to be visible
-    await page.waitForSelector(".recipe-card");
+    await expect(page.locator(".recipe-card").first()).toBeVisible();
   });
 
   test("should redirect to meal detail page when a recipe is clicked", async ({
     page,
   }) => {
     // Wait for the recipe cards to be visible
-    await page.waitForSelector(".recipe-card");
+    const recipeCard = await page.locator(".recipe-card").first();
 
     // Click on the first recipe card
-    await page.click(".recipe-card");
+    await recipeCard.click();
 
     // Check if the URL contains '/meal-detail/'
     await expect(page).toHaveURL(/\/meal-detail\//);
@@ -24,7 +24,7 @@ test.describe("Category", () => {
     page,
   }) => {
     // Wait for the recipe cards to be visible
-    await page.waitForSelector(".recipe-card");
+    await page.locator(".recipe-card");
 
     // Click on the favorite button of the first recipe card
     await page
@@ -36,7 +36,7 @@ test.describe("Category", () => {
     const favorites = await page.evaluate(() => {
       return JSON.parse(localStorage.getItem("favoriteRecipes") || "[]");
     });
-    console.log(favorites);
+
     await expect(favorites).toHaveLength(1);
     await expect(favorites[0].strMeal).toEqual("Algerian Kefta (Meatballs)");
   });
@@ -45,7 +45,7 @@ test.describe("Category", () => {
     page,
   }) => {
     // Wait for the recipe cards to be visible
-    await page.waitForSelector(".recipe-card");
+    await page.locator(".recipe-card");
 
     // Click on the favorite button of the first recipe card
     await page
@@ -74,11 +74,11 @@ test.describe("Category", () => {
     page,
   }) => {
     // Wait for the "Goat" category pill to be visible and click it
-    await page.waitForSelector("#Goat");
-    await page.click("#Goat");
+    const goatBtn = await page.locator("#Goat");
+    await goatBtn.click();
 
     // Wait for the recipe cards to be visible
-    await page.waitForSelector(".recipe-card");
+    await page.locator(".recipe-card").first();
 
     // Check that both goat recipes are displayed
     await expect(
@@ -93,11 +93,11 @@ test.describe("Category", () => {
     page,
   }) => {
     // Wait for the "Goat" category pill to be visible and click it
-    await page.waitForSelector("#Goat");
-    await page.click("#Goat");
+    const goatBtn = await page.locator("#Goat");
+    await goatBtn.click();
 
     // Wait for the recipe cards to be visible
-    await page.waitForSelector(".recipe-card");
+    await page.locator(".recipe-card");
 
     // Check that both goat recipes are displayed
     await expect(
@@ -108,8 +108,8 @@ test.describe("Category", () => {
     ).toBeVisible();
 
     // Set search bar to chicken
-    await page.waitForSelector("#search-input");
-    await page.fill("#search-input", "jamaican");
+    const searchInput = page.locator("#search-input");
+    await searchInput.fill("jamaican");
 
     //check if only Jamaican Curry is left
     await expect(

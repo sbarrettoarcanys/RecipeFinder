@@ -4,14 +4,16 @@ test.describe("Meal Detail", () => {
     await page.goto("http://localhost:5173/");
 
     // Wait for the recipe cards to be visible
-    await page.waitForSelector(".recipe-card");
+    const recipeCardsLocator = await page.locator(".recipe-card");
+    await expect(recipeCardsLocator.first()).toBeVisible();
   });
 
   test("should display meal details when a recipe card is clicked", async ({
     page,
   }) => {
     // Click on the first recipe card
-    await page.click(".recipe-card");
+    const recipeCard = await page.locator(".recipe-card").first();
+    await recipeCard.click();
 
     //check if the page contains the meal details
     await expect(page.locator(".meal-detail")).toBeVisible();
@@ -28,7 +30,7 @@ test.describe("Meal Detail", () => {
     await page.goto("http://localhost:5173/meal-detail/533229");
 
     // Wait for the meal details to load
-    await page.waitForSelector(".meal-detail-error");
+    await page.locator(".meal-detail-error");
 
     // Check if the error message is displayed
     await expect(page.locator(".meal-detail-error")).toHaveText(
@@ -38,28 +40,31 @@ test.describe("Meal Detail", () => {
 
   test("Back button return to previous page with URL", async ({ page }) => {
     // Select the "Ingredient" filter
-    await page.waitForSelector("#ingredient");
-    await page.click("#ingredient");
+    const ingredientBtn = await page.locator("#ingredient");
+    await ingredientBtn.click();
 
     // Set search bar to chicken
-    await page.waitForSelector("#search-input");
-    await page.fill("#search-input", "chicken");
+    const searchInput = await page.locator("#search-input");
+    await searchInput.fill("chicken");
 
     // Wait for the recipe cards to be visible
-    // await page.waitForSelector(".recipe-card");
     await page.waitForURL(/search=chicken/);
 
     // Click on the first recipe card
-    await page.click(".recipe-card");
+    const recipeCard = await page.locator(".recipe-card").first();
+    await expect(recipeCard).toBeVisible();
+    await recipeCard.click();
 
     //wait for back button to be visible
-    await page.waitForSelector("#backBtn");
+    const backBtn = await page.locator("#backBtn");
 
     //click back button
-    await page.click("#backBtn");
+    await backBtn.click();
 
     // Wait for the recipe cards to be visible
-    await page.waitForSelector(".recipe-card");
+
+    const newRecipeCardsLocator = await page.locator(".recipe-card");
+    await expect(newRecipeCardsLocator.first()).toBeVisible();
 
     //check if the URL contains the filters
     await expect(page).toHaveURL((url) => {
@@ -77,10 +82,12 @@ test.describe("Meal Detail", () => {
     page,
   }) => {
     // Click on the first recipe card
-    await page.click(".recipe-card");
+    const recipeCard = await page.locator(".recipe-card").first();
+    await recipeCard.click();
 
     // Wait for the meal details to load
-    await page.waitForSelector(".meal-detail-favorite");
+    const favoriteBtn = await page.locator(".meal-detail-favorite");
+    await expect(favoriteBtn).toBeVisible();
 
     // Click on the favorite button of the first recipe card
     await page.getByRole("button", { name: "Favorite" }).click();
@@ -96,10 +103,12 @@ test.describe("Meal Detail", () => {
     page,
   }) => {
     // Click on the first recipe card
-    await page.click(".recipe-card");
+    const recipeCard = await page.locator(".recipe-card").first();
+    await recipeCard.click();
 
     // Wait for the meal details to load
-    await page.waitForSelector(".meal-detail-favorite");
+    const favoriteBtn = await page.locator(".meal-detail-favorite");
+    await expect(favoriteBtn).toBeVisible();
 
     // Click on the favorite button of the first recipe card
     await page.getByRole("button", { name: "Favorite" }).click();
