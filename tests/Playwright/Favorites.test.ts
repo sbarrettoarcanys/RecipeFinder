@@ -156,47 +156,54 @@ test.describe("Favorites", () => {
     page,
   }) => {
     // Wait for the recipe cards to be visible
-    const recipeCard = await page.locator(".recipe-card").first();
-    await expect(recipeCard).toBeVisible();
-    // Click on the first recipe card
-    await recipeCard.click();
+    await expect(page.getByRole("link", { name: "Flan Flan" })).toBeVisible();
+    // // Click on the first recipe card
+    await page.getByRole("link", { name: "Flan Flan" }).click();
 
-    // Check if the URL contains '/meal-detail/'
+    // // Check if the URL contains '/meal-detail/'
     await expect(page).toHaveURL(/\/meal-detail\//);
+    await expect(page.getByRole("img", { name: "Flan" })).toBeVisible();
   });
 
   test("should show 'Empanada' and 'Arepa pelua' when 'Beef' filter is selected", async ({
     page,
   }) => {
-    // Wait for the "Beef" category pill to be visible and click it
-    const beefBtn = await page.locator("#Beef");
-    await beefBtn.click();
-
-    // Wait for the recipe cards to be visible
-    const recipeCard = await page.locator(".recipe-card").first();
-    expect(recipeCard).toBeVisible();
-
-    // Check that both Beef recipes are displayed
-    const empanadaCard = page.getByRole("heading", { name: "Empanada" });
-    await expect(empanadaCard).toBeVisible();
-
-    const arepaCard = page.getByRole("heading", { name: "Arepa pelua" });
-    await expect(arepaCard).toBeVisible();
+    await expect(page.locator("#Beef")).toBeVisible();
+    await expect(page.getByRole("main")).toBeVisible();
+    await page.locator("#Beef").click();
+    await expect(
+      page.getByRole("link", { name: "Empanada Empanada" }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("link", { name: "Arepa pelua Arepa pelua" }),
+    ).toBeVisible();
   });
 
   test("should only show 'Arepa pelua' when 'Beef' filter is selected and 'arepa' is typed in searchbar", async ({
     page,
   }) => {
+    //check if the page is loaded
     await expect(page.locator("#Beef")).toBeVisible();
-    await expect(page.locator(".search-bar")).toBeVisible();
-
     await expect(page.getByRole("main")).toBeVisible();
 
-    await page.getByRole("textbox", { name: "Search recipes" }).click();
-    await page.getByRole("textbox", { name: "Search recipes" }).fill("arepa");
-
+    //filter by beef
     await page.locator("#Beef").click();
 
+    //check if empanada and arepa are visible
+    await expect(
+      page.getByRole("link", { name: "Empanada Empanada" }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("link", { name: "Arepa pelua Arepa pelua" }),
+    ).toBeVisible();
+
+    //search only for arepa
+    await page.locator("#search-input").fill("arepa");
+
+    //check if only arepa is visible
+    await expect(
+      page.getByRole("link", { name: "Empanada Empanada" }),
+    ).not.toBeVisible();
     await expect(
       page.getByRole("link", { name: "Arepa pelua Arepa pelua" }),
     ).toBeVisible();
@@ -205,31 +212,35 @@ test.describe("Favorites", () => {
   test("should only show 'Empanada' when 'Beef' filter is selected and 'Arepa pelua' is unfavorited", async ({
     page,
   }) => {
-    // Wait for the "beef" category pill to be visible and click it
-    const beefBtn = await page.locator("#Beef");
-    await beefBtn.click();
+    //check if filter and search bar is visible
+    await expect(page.locator("#Beef")).toBeVisible();
+    await expect(page.locator("#search-input")).toBeVisible();
 
-    // Wait for the recipe cards to be visible
-    await expect(page.locator(".recipe-card").first()).toBeVisible({
-      timeout: 5000,
-    });
+    //click beef filter
+    await page.locator("#Beef").click();
 
-    // Check that both Beef recipes are displayed
-    const empanadaCard = page.getByRole("heading", { name: "Empanada" });
-    await expect(empanadaCard).toBeVisible();
+    //check if empanada and arepa are visible
+    await expect(
+      page.getByRole("link", { name: "Empanada Empanada" }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("link", { name: "Arepa pelua Arepa pelua" }),
+    ).toBeVisible();
 
-    const arepaCard = page.getByRole("heading", { name: "Arepa pelua" });
-    await expect(arepaCard).toBeVisible();
-
-    // Click on the unfavorite button of the Arepa pelua
+    //unfavorite arepa
     await page
-      .getByRole("link", { name: "Arepa pelua" })
+      .getByRole("img", { name: "Arepa pelua" })
       .getByRole("button", { name: "Unfavorite" })
       .click();
 
-    //check if arepa pelua is not visible
-    await expect(empanadaCard).toBeVisible();
-    await expect(arepaCard).not.toBeVisible();
+    //check if only arepa is visible
+    await expect(
+      page.getByRole("link", { name: "Arepa pelua Arepa pelua" }),
+    ).not.toBeVisible();
+
+    await expect(
+      page.getByRole("link", { name: "Empanada Empanada" }),
+    ).toBeVisible();
   });
 
   test("should show 'Satee' in favorites page when favorited in Homepage", async ({

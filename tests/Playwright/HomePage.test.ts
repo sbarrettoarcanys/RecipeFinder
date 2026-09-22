@@ -102,14 +102,15 @@ test.describe("Home Page", () => {
     page,
     context,
   }) => {
-    // Wait for the recipe cards to be visible
-    await page.locator(".recipe-card");
+    // Wait for the recipe cards to be visible.
+    const recipeCardsLocator = await page.locator(".recipe-card");
+    await expect(recipeCardsLocator.first()).toBeVisible();
 
     // Simulate an API failure by intercepting the network request
     await context.setOffline(true);
 
     // Click on the first recipe card
-    await page.click(".recipe-card");
+    await recipeCardsLocator.first().click();
 
     // Check if the error message is displayed
     await expect(page.getByText("Failed to load")).toBeVisible();
@@ -229,35 +230,27 @@ test.describe("Home Page", () => {
   test("should display 'No results for this query.' in the recommended grid when the search bar has 'sdasdsad' and the 'Dish Name' filter is selected", async ({
     page,
   }) => {
-    // Set search bar to a nonsense string
-    const searchInput = await page.locator("#search-input");
-    await searchInput.fill("sdasdsad");
+    await expect(page.locator(".search-bar")).toBeVisible();
+    await page.getByText("Dish Name").click();
 
-    // Select the "Dish Name" filter
-    const dishNameBtn = await page.locator("#dish-name");
-    await dishNameBtn.click();
+    await page
+      .getByRole("textbox", { name: "Search recipes" })
+      .fill("sdasdadasd");
 
-    // Check that the recommended grid shows the no-results message
-    await expect(
-      page.locator(".recommended-grid").getByText("No results for this query."),
-    ).toBeVisible();
+    await expect(page.getByText("No results for this query.")).toBeVisible();
   });
 
   test("should display 'No results for this query.' in the recommended grid when the search bar has 'sdasdsad' and the category filter is selected", async ({
     page,
   }) => {
-    // Set search bar to a nonsense string
-    const searchInput = await page.locator("#search-input");
-    await searchInput.fill("sdasdsad");
+    await expect(page.locator(".search-bar")).toBeVisible();
+    await page.getByText("Category").click();
 
-    // Select the "Category" filter
-    const categoryBtn = await page.locator("#category");
-    await categoryBtn.click();
+    await page
+      .getByRole("textbox", { name: "Search recipes" })
+      .fill("sdasdadasd");
 
-    // Check that the recommended grid shows the no-results message
-    await expect(
-      page.locator(".recommended-grid").getByText("No results for this query."),
-    ).toBeVisible();
+    await expect(page.getByText("No results for this query.")).toBeVisible();
   });
 
   test("should display 'No results for this query.' in the recommended grid when the search bar has 'sdasdsad' and the ingredient filter is selected", async ({
