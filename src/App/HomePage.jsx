@@ -2,11 +2,8 @@ import { useState, useEffect } from "react";
 import "@/Styles/HomePage.css";
 import "@/Styles/App.css";
 
-import { debounceInput } from "../Hooks/Debounce.js";
-import {
-  getRecipesQueryOption,
-  getRecipeByIdQueryOption,
-} from "../Hooks/ApiCalls.js";
+import { useDebounce } from "../Hooks/Debounce.js";
+import { getRecipesQueryOption } from "../Hooks/ApiCalls.js";
 import { RecipeList } from "../Components/RecipeList.jsx";
 import { SearchBar } from "../Components/SearchBar.jsx";
 import { HomeFilterRecipes } from "../Components/HomeFilterRecipes.jsx";
@@ -22,7 +19,7 @@ export default function Homepage() {
   const [search, setSearch] = useState(searchParams.get("search") || "");
   const [filter, setFilter] = useState(searchParams.get("filter") || "s");
 
-  const debouncedSearch = debounceInput(search, 500);
+  const debouncedSearch = useDebounce(search, 500);
 
   const {
     data,
@@ -71,7 +68,9 @@ export default function Homepage() {
         <div className="section-head">
           <h2>Recommended</h2>
           <SurpriseMeLink>
-            <h1 className="see-all">Surprise Me! →</h1>
+            <h1 className="see-all" id="surprise-me">
+              Surprise Me! →
+            </h1>
           </SurpriseMeLink>
         </div>
         <div className="recommended-grid">

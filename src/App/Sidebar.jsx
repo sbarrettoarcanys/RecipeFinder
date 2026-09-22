@@ -70,7 +70,7 @@ export default function SideBar() {
             </div>
           </NavLink>
           <SurpriseMeLink>
-            <div title="Random">
+            <div title="Random" id="randomNav">
               <svg
                 width="20"
                 height="20"

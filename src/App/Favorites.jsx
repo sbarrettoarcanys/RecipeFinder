@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import "@/Styles/HomePage.css";
-import { debounceInput } from "../Hooks/Debounce.js";
+import { useDebounce } from "../Hooks/Debounce.js";
 import { getAllCategoriesQueryOption } from "../Hooks/ApiCalls.js";
 import { useFavoriteRecipeContext } from "../Context/FavoriteRecipeContext.jsx";
 import { RecipeList } from "../Components/RecipeList.jsx";
@@ -20,7 +20,7 @@ export default function Favorites() {
   const [error, setError] = useState(null);
 
   const [search, setSearch] = useState(searchParams.get("search") || "");
-  const debouncedSearch = debounceInput(search, 500);
+  const debouncedSearch = useDebounce(search, 500);
 
   const defaultCategory = {
     idCategory: "0",
@@ -31,11 +31,9 @@ export default function Favorites() {
   const [filter, setFilter] = useState(searchParams.get("filter") || "All");
 
   //get all categories
-  const {
-    data: categoriesData,
-    error: categoriesError,
-    isPending: categoriesLoading,
-  } = useQuery(getAllCategoriesQueryOption());
+  const { data: categoriesData, error: categoriesError } = useQuery(
+    getAllCategoriesQueryOption(),
+  );
   const categories = [defaultCategory, ...(categoriesData?.categories || [])];
 
   if (categoriesError) {
@@ -89,7 +87,7 @@ export default function Favorites() {
     return () => {
       isCancelled = true;
     };
-  }, [debouncedSearch, filter]);
+  }, [debouncedSearch, filter, searchFavoriteRecipe, setSearchParams]);
 
   return (
     <>
