@@ -20,6 +20,8 @@ export default function MealDetail() {
     error,
   } = useQuery({ ...getRecipeByIdQueryOption(id), enabled: isValidId });
 
+  console.log(error);
+
   if (!isValidId) {
     return (
       <div className="meal-detail-error" role="alert">
@@ -27,8 +29,6 @@ export default function MealDetail() {
       </div>
     );
   }
-
-  const recipe = data;
 
   if (loading) {
     return <p>Loading recipe...</p>;
@@ -39,10 +39,15 @@ export default function MealDetail() {
       route: "MealDetail",
       Action: "getRecipeByIdQueryOption",
     });
-    return <p className="error">{error}</p>;
+    return (
+      <div className="meal-detail-error" role="alert">
+        Error: No recipe found.
+      </div>
+    );
   }
+  const recipe = data;
 
-  if (!recipe) {
+  if (!recipe || recipe.strMeal === undefined) {
     return (
       <div className="meal-detail-error" role="alert">
         Error: No recipe found.

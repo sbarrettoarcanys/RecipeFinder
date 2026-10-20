@@ -25,10 +25,14 @@ export default function RandomMeal() {
   if (error) {
     logError(error, { route: "Random", Action: "getRandomRecipeQueryOption" });
 
-    return <p className="error">{error}</p>;
+    return (
+      <div className="meal-detail-error" role="alert">
+        Error: No recipe found.
+      </div>
+    );
   }
 
-  if (!recipe) {
+  if (!recipe || recipe.strMeal === undefined) {
     return (
       <div className="meal-detail-error" role="alert">
         Error: No recipe found.
