@@ -22,6 +22,26 @@
 * {
   box-sizing: border-box;
 }
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+.nav-btn:focus-visible,
+.pill:focus-visible,
+.badge:focus-visible,
+.recipe-card:focus-visible,
+.icon-btn:focus-visible,
+.btn-primary:focus-visible {
+  outline: 2px solid var(--accent-dark);
+  outline-offset: 2px;
+}
 html,
 body {
   margin: 0;
@@ -53,6 +73,8 @@ a {
   position: sticky;
   top: 0;
   height: 100vh;
+  /* Keep the sidebar (and its settings dropdown) above page content */
+  z-index: 100;
 }
 .sidebar .logo {
   width: 40px;
@@ -92,6 +114,58 @@ a {
 .nav-btn.active {
   background: var(--accent-light);
   color: var(--accent-dark);
+}
+.settings-menu {
+  position: relative;
+}
+.settings-menu .nav-btn {
+  border: none;
+  background: transparent;
+  padding: 0;
+}
+.settings-menu .nav-btn:hover {
+  background: var(--pill-bg);
+}
+.settings-menu .nav-btn.active {
+  background: var(--accent-light);
+}
+.settings-dropdown {
+  position: absolute;
+  left: calc(100% + 12px);
+  bottom: 0;
+  min-width: 160px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  padding: 6px;
+  z-index: 1000;
+}
+.settings-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  border: none;
+  background: transparent;
+  border-radius: 12px;
+  padding: 10px 12px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    color 0.15s;
+}
+.settings-item:hover {
+  background: var(--pill-bg);
+  color: var(--heart);
+}
+.settings-item:focus-visible {
+  outline: 2px solid var(--accent-dark);
+  outline-offset: 2px;
 }
 .sidebar .avatar-btn {
   width: 44px;
@@ -239,7 +313,7 @@ a {
   font-weight: 700;
   margin: 0;
 }
-.see-all {
+.link-text {
   font-size: 14px;
   font-weight: 600;
   color: var(--accent-dark);
@@ -282,10 +356,13 @@ a {
   align-items: center;
   gap: 4px;
   background: rgba(255, 255, 255, 0.94);
+  border: none;
   border-radius: 20px;
   padding: 5px 10px;
+  font-family: inherit;
   font-size: 12px;
   font-weight: 700;
+  cursor: pointer;
 }
 .badge.rating {
   color: #c17c00;
@@ -383,7 +460,9 @@ a {
 .pill {
   flex: 0 0 auto;
   padding: 10px 20px;
+  border: none;
   border-radius: 20px;
+  font-family: inherit;
   font-size: 14px;
   font-weight: 600;
   background: var(--pill-bg);
@@ -480,7 +559,7 @@ a {
     grid-template-columns: 1fr;
   }
   .sidebar {
-    position: static;
+    position: relative;
     height: auto;
     flex-direction: row;
     width: 100%;
@@ -490,6 +569,12 @@ a {
   .sidebar nav {
     flex-direction: row;
     flex: 0;
+  }
+  .settings-dropdown {
+    left: auto;
+    right: 0;
+    bottom: auto;
+    top: calc(100% + 8px);
   }
   .main {
     padding: 24px 20px 48px;

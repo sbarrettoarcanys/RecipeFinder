@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import "@/Styles/HomePage.css";
 import { useDebounce } from "../Hooks/Debounce.js";
-import { getAllCategoriesQueryOption } from "../Hooks/ApiCalls.js";
+import { getAllCategoriesQueryOption } from "../Hooks/MealDbApiCalls.ts";
 import { useFavoriteRecipeContext } from "../Context/FavoriteRecipeContext.jsx";
 import { RecipeList } from "../Components/RecipeList.jsx";
 import { SearchBar } from "../Components/SearchBar.jsx";
@@ -11,7 +11,13 @@ import { useQuery } from "@tanstack/react-query";
 import { logError } from "../Utils/ErrorLogger.js";
 
 export default function Favorites() {
-  const { favoriteRecipes, searchFavoriteRecipe } = useFavoriteRecipeContext();
+  const {
+    favoriteRecipes,
+    searchFavoriteRecipe,
+    isLoading: favoritesLoading,
+    error: favoritesError,
+  } = useFavoriteRecipeContext();
+
   const [searchParams, setSearchParams] = useSearchParams();
 
   const [favorites, setFavorites] = useState(favoriteRecipes);
@@ -89,6 +95,10 @@ export default function Favorites() {
     };
   }, [debouncedSearch, filter, searchFavoriteRecipe, setSearchParams]);
 
+  //include the context's remote favorites status in what the page shows
+  const isLoading = loading || favoritesLoading;
+  const errorMessage = error || favoritesError?.message;
+
   return (
     <>
       <div className="topbar">
@@ -96,7 +106,11 @@ export default function Favorites() {
           <h1>Favorites</h1>
         </div>
 
-        <div style={{ display: "flex", gap: "1rem" }}>
+        <div
+          role="search"
+          aria-label="Search recipes"
+          style={{ display: "flex", gap: "1rem" }}
+        >
           <SearchBar search={search} onSearchChange={setSearch} />
           <FilterRecipes
             filter={filter}
@@ -108,16 +122,20 @@ export default function Favorites() {
 
       <div className="section">
         <div className="section-head"></div>
-        <div className="recommended-grid">
-          {loading && <p>Loading recipes...</p>}
+        <div
+          className="recommended-grid"
+          aria-live="polite"
+          aria-busy={isLoading}
+        >
+          {isLoading && <p>Loading recipes...</p>}
 
-          {error && <p className="error">{error}</p>}
+          {errorMessage && <p className="error">{errorMessage}</p>}
 
-          {favorites.length === 0 && !loading && !error && (
+          {favorites.length === 0 && !isLoading && !errorMessage && (
             <p>No results for this query.</p>
           )}
 
-          {!loading && !error && <RecipeList recipes={favorites} />}
+          {!isLoading && !errorMessage && <RecipeList recipes={favorites} />}
         </div>
       </div>
     </>

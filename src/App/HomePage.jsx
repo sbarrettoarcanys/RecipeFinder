@@ -1,9 +1,8 @@
 import { useState, useEffect } from "react";
 import "@/Styles/HomePage.css";
-import "@/Styles/App.css";
 
 import { useDebounce } from "../Hooks/Debounce.js";
-import { getRecipesQueryOption } from "../Hooks/ApiCalls.js";
+import { getRecipesQueryOption } from "../Hooks/MealDbApiCalls.ts";
 import { RecipeList } from "../Components/RecipeList.jsx";
 import { SearchBar } from "../Components/SearchBar.jsx";
 import { HomeFilterRecipes } from "../Components/HomeFilterRecipes.jsx";
@@ -31,7 +30,7 @@ export default function Homepage() {
     logError(error, { route: "Homepage", Action: "getRecipesQueryOption" });
   }
 
-  const recipes = data?.meals || [];
+  const recipes = data || [];
 
   useEffect(() => {
     setSearchParams((prevParams) => {
@@ -58,7 +57,11 @@ export default function Homepage() {
           <h1>Recipes</h1>
         </div>
 
-        <div style={{ display: "flex", gap: "1rem" }}>
+        <div
+          role="search"
+          aria-label="Search recipes"
+          style={{ display: "flex", gap: "1rem" }}
+        >
           <SearchBar search={search} onSearchChange={setSearch} />
           <HomeFilterRecipes filter={filter} onFilterChange={setFilter} />
         </div>
@@ -68,12 +71,16 @@ export default function Homepage() {
         <div className="section-head">
           <h2>Recommended</h2>
           <SurpriseMeLink>
-            <h1 className="see-all" id="surprise-me">
-              Surprise Me! →
-            </h1>
+            <span className="link-text" id="surprise-me">
+              Surprise Me! <span aria-hidden="true">→</span>
+            </span>
           </SurpriseMeLink>
         </div>
-        <div className="recommended-grid">
+        <div
+          className="recommended-grid"
+          aria-live="polite"
+          aria-busy={loading}
+        >
           {loading && <p>Loading recipes...</p>}
 
           {error && <p className="error">{error.message}</p>}

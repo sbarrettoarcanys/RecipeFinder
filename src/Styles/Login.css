@@ -1,0 +1,113 @@
+/* ================= Login ================= */
+/* No sidebar on auth pages: collapse the 88px sidebar column */
+.app:has(.login-page) {
+  grid-template-columns: 1fr;
+}
+
+.login-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 96px);
+}
+
+.login-card {
+  width: 100%;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  background: var(--card-bg);
+  border-radius: var(--radius-lg);
+  padding: 36px 32px;
+  box-shadow: var(--shadow-md);
+}
+
+.login-card .titles .eyebrow {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin: 0 0 4px;
+}
+.login-card .titles h1 {
+  font-size: 32px;
+  font-weight: 700;
+  margin: 0;
+  letter-spacing: -0.4px;
+}
+
+.login-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.login-field label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--pill-text);
+}
+.login-field .search-bar {
+  max-width: none;
+  transition: border-color 0.15s;
+}
+.login-field .search-bar:focus-within {
+  border-color: var(--accent);
+}
+/* Hide Edge's built-in reveal button so it doesn't duplicate the toggle */
+.login-field input::-ms-reveal {
+  display: none;
+}
+.password-toggle {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: color 0.15s;
+}
+.password-toggle:hover,
+.password-toggle:focus-visible {
+  color: var(--text-primary);
+}
+
+.login-error {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--heart);
+}
+
+.login-submit {
+  justify-content: center;
+  width: 100%;
+  font-family: inherit;
+}
+.login-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.login-submit:disabled:hover {
+  background: var(--accent);
+}
+
+.login-footer {
+  margin: 0;
+  text-align: center;
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+.login-footer .link-text:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 860px) {
+  .login-page {
+    min-height: calc(100vh - 72px);
+  }
+  .login-card {
+    padding: 28px 22px;
+  }
+}

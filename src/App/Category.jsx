@@ -4,7 +4,7 @@ import { useDebounce } from "../Hooks/Debounce.js";
 import {
   getAllCategoriesQueryOption,
   getRecipesByCategoryQueryOption,
-} from "../Hooks/ApiCalls.js";
+} from "../Hooks/MealDbApiCalls.ts";
 import { RecipeList } from "../Components/RecipeList.jsx";
 import { SearchBar } from "../Components/SearchBar.jsx";
 import { FilterRecipes } from "../Components/FilterRecipes.jsx";
@@ -78,7 +78,11 @@ export default function Homepage() {
           <h1>Category</h1>
         </div>
 
-        <div style={{ display: "flex", gap: "1rem" }}>
+        <div
+          role="search"
+          aria-label="Search recipes"
+          style={{ display: "flex", gap: "1rem" }}
+        >
           <SearchBar search={search} onSearchChange={setSearch} />
           <FilterRecipes
             filter={filter}
@@ -92,7 +96,11 @@ export default function Homepage() {
         <div className="section-head">
           <h2>Recommended</h2>
         </div>
-        <div className="recommended-grid">
+        <div
+          className="recommended-grid"
+          aria-live="polite"
+          aria-busy={loading}
+        >
           {loading && <p>Loading recipes...</p>}
 
           {error && <p className="error">{error.message}</p>}

@@ -10,10 +10,13 @@
     "test": "playwright test tests/Playwright",
     "lint": "eslint .",
     "prepare": "husky",
-    "test:unit": "vitest --environment jsdom tests/Vitest"
+    "test:unit": "vitest --environment jsdom tests/Vitest",
+    "test:all": "npx playwright test tests/Playwright && npm run vitest --environment jsdom tests/Vitest"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.118.0",
     "@tanstack/react-query": "^5.102.4",
+    "firebase": "^12.19.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "react-error-boundary": "^6.1.3",

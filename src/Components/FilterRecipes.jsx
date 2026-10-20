@@ -5,19 +5,25 @@ function FilterRecipesImpl({ filter, onFilterChange, categoryFilters }) {
 
   return (
     <>
-      <div className="pill-row">
+      <div
+        className="pill-row"
+        role="group"
+        aria-label="Filter recipes by category"
+      >
         {categoryFilters.map((filter) => (
-          <div
+          <button
+            type="button"
             key={filter.idCategory}
             id={filter.strCategory}
             className={`pill ${activeFilter === filter.strCategory ? "active" : ""}`}
+            aria-pressed={activeFilter === filter.strCategory}
             onClick={() => {
               setActiveFilter(filter.strCategory);
               onFilterChange(filter.strCategory);
             }}
           >
             {filter.strCategory}
-          </div>
+          </button>
         ))}
       </div>
     </>

@@ -1,9 +1,9 @@
 import { useParams, useNavigate } from "react-router";
 import "@/Styles/MealDetail.css";
-import { getRecipeByIdQueryOption } from "../Hooks/ApiCalls.js";
+import { getRecipeByIdQueryOption } from "../Hooks/MealDbApiCalls.ts";
 import IngredientList from "../Components/IngredientsList.jsx";
 import StepList from "../Components/StepList.jsx";
-import { FavoriteButton } from "../Components/RecipeList.jsx";
+import { FavoriteButton } from "../Components/FavoriteButton.jsx";
 import { useQuery } from "@tanstack/react-query";
 import { logError } from "../Utils/ErrorLogger.js";
 
@@ -20,11 +20,15 @@ export default function MealDetail() {
     error,
   } = useQuery({ ...getRecipeByIdQueryOption(id), enabled: isValidId });
 
-  if (!isValidId) {
-    return <div className="meal-detail-error">Error: No recipe found.</div>;
-  }
+  console.log(error);
 
-  const recipe = data?.meals?.[0] || null;
+  if (!isValidId) {
+    return (
+      <div className="meal-detail-error" role="alert">
+        Error: No recipe found.
+      </div>
+    );
+  }
 
   if (loading) {
     return <p>Loading recipe...</p>;
@@ -35,20 +39,35 @@ export default function MealDetail() {
       route: "MealDetail",
       Action: "getRecipeByIdQueryOption",
     });
-    return <p className="error">{error}</p>;
+    return (
+      <div className="meal-detail-error" role="alert">
+        Error: No recipe found.
+      </div>
+    );
   }
+  const recipe = data;
 
-  if (!recipe) {
-    return <div className="meal-detail-error">Error: No recipe found.</div>;
+  if (!recipe || recipe.strMeal === undefined) {
+    return (
+      <div className="meal-detail-error" role="alert">
+        Error: No recipe found.
+      </div>
+    );
   }
 
   return (
     <>
-      <span className="nav-btn" role="button" onClick={() => navigate(-1)}>
-        <h1 className="see-all" id="backBtn">
-          ← Back
-        </h1>
-      </span>
+      <button
+        type="button"
+        id="backBtn"
+        className="pill"
+        aria-label="Back to previous page"
+        onClick={() => navigate(-1)}
+      >
+        <div className="link-text">
+          <span aria-hidden="true">←</span> Back
+        </div>
+      </button>
       <div className="meal-detail">
         <div className="meal-detail-head">
           <div className="meal-detail-titles">

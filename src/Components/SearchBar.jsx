@@ -10,10 +10,15 @@ export function SearchBar({ search, onSearchChange }) {
           stroke="currentColor"
           strokeWidth="2"
           strokeLinecap="round"
+          aria-hidden="true"
+          focusable="false"
         >
           <circle cx="11" cy="11" r="7" />
           <path d="M21 21l-4.3-4.3" />
         </svg>
+        <label htmlFor="search-input" className="visually-hidden">
+          Search recipes
+        </label>
         <input
           type="text"
           placeholder="Search recipes"
