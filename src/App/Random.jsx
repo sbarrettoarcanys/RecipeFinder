@@ -1,8 +1,8 @@
 import "@/Styles/MealDetail.css";
-import { getRandomRecipeQueryOption } from "../Hooks/ApiCalls.js";
+import { getRandomRecipeQueryOption } from "../Hooks/MealDbApiCalls.ts";
 import IngredientList from "../Components/IngredientsList.jsx";
 import StepList from "../Components/StepList.jsx";
-import { FavoriteButton } from "../Components/RecipeList.jsx";
+import { FavoriteButton } from "../Components/FavoriteButton.jsx";
 import { useQuery } from "@tanstack/react-query";
 import { logError } from "../Utils/ErrorLogger.js";
 import { useNavigate } from "react-router";
@@ -29,16 +29,26 @@ export default function RandomMeal() {
   }
 
   if (!recipe) {
-    return <div className="meal-detail-error">Error: No recipe found.</div>;
+    return (
+      <div className="meal-detail-error" role="alert">
+        Error: No recipe found.
+      </div>
+    );
   }
 
   return (
     <>
-      <span className="nav-btn" role="button" onClick={() => navigate(-1)}>
-        <h1 className="see-all" id="backBtn">
-          ← Back
-        </h1>
-      </span>
+      <button
+        type="button"
+        id="backBtn"
+        className="pill"
+        aria-label="Back to previous page"
+        onClick={() => navigate(-1)}
+      >
+        <div className="link-text">
+          <span aria-hidden="true">←</span> Back
+        </div>
+      </button>
       <div className="meal-detail">
         <div className="meal-detail-head">
           <div className="meal-detail-titles">
@@ -63,6 +73,8 @@ export default function RandomMeal() {
                   strokeWidth="1.8"
                   strokeLinecap="round"
                   strokeLinejoin="round"
+                  aria-hidden="true"
+                  focusable="false"
                 >
                   <path d="M7 2v20M7 2a3 3 0 0 0-3 3v6a3 3 0 0 0 3 3M17 2v8a3 3 0 1 1-6 0V2M17 12v10" />
                 </svg>
@@ -80,6 +92,8 @@ export default function RandomMeal() {
                   strokeWidth="1.8"
                   strokeLinecap="round"
                   strokeLinejoin="round"
+                  aria-hidden="true"
+                  focusable="false"
                 >
                   <circle cx="12" cy="12" r="9" />
                   <path d="M3 12h18M12 3c2.5 2.5 4 6 4 9s-1.5 6.5-4 9c-2.5-2.5-4-6-4-9s1.5-6.5 4-9z" />

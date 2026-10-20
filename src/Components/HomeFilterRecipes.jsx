@@ -11,19 +11,21 @@ function HomeFilterRecipesImpl({ filter, onFilterChange }) {
 
   return (
     <>
-      <div className="pill-row">
+      <div className="pill-row" role="group" aria-label="Filter recipes by">
         {filters.map((filter) => (
-          <div
+          <button
+            type="button"
             id={filter.id}
             key={filter.id}
             className={`pill ${activeFilter === filter.value ? "active" : ""}`}
+            aria-pressed={activeFilter === filter.value}
             onClick={() => {
               setActiveFilter(filter.value);
               onFilterChange(filter.value);
             }}
           >
             {filter.label}
-          </div>
+          </button>
         ))}
       </div>
     </>

@@ -6,7 +6,7 @@ import {
   getRecipesByCategoryQueryOption,
   getAllCategoriesQueryOption,
   getRecipeByIdQueryOption,
-} from "../../../src/Hooks/ApiCalls.js";
+} from "../../../src/Hooks/MealDbApiCalls.ts";
 import {
   QueryClient,
   useQuery,
@@ -231,7 +231,7 @@ describe("getAllCategoriesQueryOption", () => {
 describe("getRecipeByIdQueryOption", () => {
   it("returns data from category endpoint", async () => {
     const { result } = renderHook(
-      () => useQuery(getRecipeByIdQueryOption(53281)),
+      () => useQuery(getRecipeByIdQueryOption("53281")),
       {
         wrapper,
       },
@@ -256,7 +256,7 @@ describe("getRecipeByIdQueryOption", () => {
     );
 
     const { result } = renderHook(
-      () => useQuery(getRecipeByIdQueryOption(53281)),
+      () => useQuery(getRecipeByIdQueryOption("53281")),
       { wrapper },
     );
 

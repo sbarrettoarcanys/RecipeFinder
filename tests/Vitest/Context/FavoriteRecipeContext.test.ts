@@ -1,10 +1,16 @@
-import { expect, it, describe, beforeEach } from "vitest";
+import { expect, it, describe, beforeEach, vi } from "vitest";
 import { createElement, type ReactNode } from "react";
 import { renderHook, act } from "@testing-library/react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   FavoriteRecipeProvider,
   useFavoriteRecipeContext,
 } from "../../../src/Context/FavoriteRecipeContext.jsx";
+
+// run as a guest so favorites use localStorage
+vi.mock("../../../src/Context/AuthContext.jsx", () => ({
+  useAuth: () => ({ user: null, loading: false }),
+}));
 
 type Meal = { idMeal: string; strMeal: string; strCategory?: string | null };
 
@@ -21,7 +27,11 @@ type FavoriteRecipeContextValue = {
 };
 
 const wrapper = ({ children }: { children: ReactNode }) =>
-  createElement(FavoriteRecipeProvider, null, children);
+  createElement(
+    QueryClientProvider,
+    { client: new QueryClient() },
+    createElement(FavoriteRecipeProvider, null, children),
+  );
 
 describe("FavoriteRecipeContext", () => {
   beforeEach(() => {
